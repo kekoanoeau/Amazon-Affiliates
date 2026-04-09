@@ -94,41 +94,6 @@
         <?php endif; ?>
 
         <!-- =============================================
-             ZONE 2: Primary Navigation (Sticky)
-             ============================================= -->
-        <div class="site-header__primary-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary navigation', 'nest-and-well' ); ?>">
-            <div class="primary-nav__inner container">
-
-                <!-- Main Navigation Menu -->
-                <?php
-                wp_nav_menu(
-                    array(
-                        'theme_location' => 'primary',
-                        'menu_id'        => 'primary-menu',
-                        'menu_class'     => 'primary-nav__menu',
-                        'container'      => 'nav',
-                        'container_id'   => 'primary-nav-container',
-                        'depth'          => 2,
-                        'fallback_cb'    => 'nest_well_primary_nav_fallback',
-                    )
-                );
-                ?>
-
-                <!-- Mobile Hamburger Button -->
-                <button class="primary-nav__hamburger"
-                        id="mobile-menu-toggle"
-                        aria-label="<?php esc_attr_e( 'Open menu', 'nest-and-well' ); ?>"
-                        aria-expanded="false"
-                        aria-controls="mobile-menu">
-                    <span class="hamburger__line" aria-hidden="true"></span>
-                    <span class="hamburger__line" aria-hidden="true"></span>
-                    <span class="hamburger__line" aria-hidden="true"></span>
-                </button>
-
-            </div><!-- .primary-nav__inner -->
-        </div><!-- .site-header__primary-nav -->
-
-        <!-- =============================================
              ZONE 3: 5-Stripe Category Bar
              ============================================= -->
         <?php get_template_part( 'template-parts/nav/stripe-nav' ); ?>
@@ -139,25 +104,3 @@
     <?php get_template_part( 'template-parts/nav/mobile-menu' ); ?>
 
     <div id="content" class="site-content">
-
-<?php
-
-/**
- * Fallback for primary nav when no menu is assigned.
- *
- * @param array $args Nav menu args.
- */
-function nest_well_primary_nav_fallback( $args ) {
-    echo '<nav id="primary-nav-container" aria-label="' . esc_attr__( 'Primary Navigation', 'nest-and-well' ) . '"><ul class="primary-nav__menu">';
-    echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'nest-and-well' ) . '</a></li>';
-    wp_list_categories(
-        array(
-            'title_li'     => '',
-            'depth'        => 1,
-            'orderby'      => 'count',
-            'order'        => 'DESC',
-            'number'       => 5,
-        )
-    );
-    echo '</ul></nav>';
-}
