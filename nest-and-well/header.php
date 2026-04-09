@@ -99,13 +99,6 @@
         <div class="site-header__primary-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary navigation', 'nest-and-well' ); ?>">
             <div class="primary-nav__inner container">
 
-                <!-- Sticky Logo (shown when header is sticky) -->
-                <div class="primary-nav__sticky-brand" aria-hidden="true">
-                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sticky-brand__link" rel="home" tabindex="-1">
-                        <span class="sticky-brand__name">Nest &amp; Well</span>
-                    </a>
-                </div>
-
                 <!-- Main Navigation Menu -->
                 <?php
                 wp_nav_menu(
