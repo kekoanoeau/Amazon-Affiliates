@@ -1,0 +1,190 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/theme.json",
+    "version": 2,
+    "settings": {
+        "appearanceTools": true,
+        "color": {
+            "custom": false,
+            "customDuotone": false,
+            "customGradient": false,
+            "defaultDuotone": false,
+            "defaultGradients": false,
+            "defaultPalette": false,
+            "duotone": [],
+            "gradients": [],
+            "palette": [
+                {
+                    "slug": "forest",
+                    "color": "#1A3C34",
+                    "name": "Forest"
+                },
+                {
+                    "slug": "sage",
+                    "color": "#4A7C59",
+                    "name": "Sage"
+                },
+                {
+                    "slug": "moss",
+                    "color": "#7BAF82",
+                    "name": "Moss"
+                },
+                {
+                    "slug": "amber",
+                    "color": "#E8A23A",
+                    "name": "Amber"
+                },
+                {
+                    "slug": "clay",
+                    "color": "#C4634A",
+                    "name": "Clay"
+                },
+                {
+                    "slug": "charcoal",
+                    "color": "#2C2C2C",
+                    "name": "Charcoal"
+                },
+                {
+                    "slug": "slate",
+                    "color": "#4A6070",
+                    "name": "Slate"
+                },
+                {
+                    "slug": "warm-white",
+                    "color": "#F5F2EE",
+                    "name": "Warm White"
+                },
+                {
+                    "slug": "lt-stone",
+                    "color": "#EDE8E0",
+                    "name": "Light Stone"
+                },
+                {
+                    "slug": "mid-stone",
+                    "color": "#C9C1B4",
+                    "name": "Mid Stone"
+                },
+                {
+                    "slug": "white",
+                    "color": "#FFFFFF",
+                    "name": "White"
+                }
+            ]
+        },
+        "layout": {
+            "contentSize": "720px",
+            "wideSize": "1140px"
+        },
+        "spacing": {
+            "units": ["px", "em", "rem", "%", "vw"]
+        },
+        "typography": {
+            "dropCap": false,
+            "fontFamilies": [
+                {
+                    "fontFamily": "'Inter', 'Helvetica Neue', Arial, sans-serif",
+                    "slug": "inter",
+                    "name": "Inter"
+                },
+                {
+                    "fontFamily": "Georgia, 'Times New Roman', serif",
+                    "slug": "georgia",
+                    "name": "Georgia"
+                }
+            ],
+            "fontSizes": [
+                {
+                    "slug": "small",
+                    "size": "13px",
+                    "name": "Small"
+                },
+                {
+                    "slug": "normal",
+                    "size": "16px",
+                    "name": "Normal"
+                },
+                {
+                    "slug": "medium",
+                    "size": "18px",
+                    "name": "Medium"
+                },
+                {
+                    "slug": "large",
+                    "size": "24px",
+                    "name": "Large"
+                },
+                {
+                    "slug": "x-large",
+                    "size": "32px",
+                    "name": "X-Large"
+                },
+                {
+                    "slug": "huge",
+                    "size": "48px",
+                    "name": "Huge"
+                }
+            ],
+            "customFontSize": false
+        }
+    },
+    "styles": {
+        "color": {
+            "background": "#F5F2EE",
+            "text": "#2C2C2C"
+        },
+        "typography": {
+            "fontFamily": "'Inter', 'Helvetica Neue', Arial, sans-serif",
+            "fontSize": "16px",
+            "lineHeight": "1.7"
+        },
+        "elements": {
+            "h1": {
+                "typography": {
+                    "fontSize": "32px",
+                    "lineHeight": "1.2",
+                    "fontWeight": "700",
+                    "letterSpacing": "-0.02em",
+                    "fontFamily": "'Inter', 'Helvetica Neue', Arial, sans-serif"
+                }
+            },
+            "h2": {
+                "typography": {
+                    "fontSize": "24px",
+                    "lineHeight": "1.3",
+                    "fontWeight": "700",
+                    "letterSpacing": "-0.01em"
+                }
+            },
+            "h3": {
+                "typography": {
+                    "fontSize": "20px",
+                    "lineHeight": "1.4",
+                    "fontWeight": "700"
+                }
+            },
+            "h4": {
+                "typography": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.4",
+                    "fontWeight": "500"
+                }
+            },
+            "link": {
+                "color": {
+                    "text": "#4A7C59"
+                }
+            }
+        }
+    },
+    "templateParts": [
+        {
+            "name": "header",
+            "title": "Header",
+            "area": "header"
+        },
+        {
+            "name": "footer",
+            "title": "Footer",
+            "area": "footer"
+        }
+    ]
+}

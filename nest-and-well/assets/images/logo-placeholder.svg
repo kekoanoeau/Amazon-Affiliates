@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60" role="img" aria-label="Nest &amp; Well">
+  <title>Nest &amp; Well</title>
+  <!-- Background -->
+  <rect width="200" height="60" fill="#1A3C34" rx="4"/>
+  <!-- Brand wordmark -->
+  <text
+    x="16"
+    y="26"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="20"
+    font-weight="bold"
+    fill="#F5F2EE"
+    letter-spacing="-0.5">Nest &amp; Well</text>
+  <!-- Tagline -->
+  <text
+    x="16"
+    y="44"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="9"
+    fill="#7BAF82"
+    letter-spacing="0.5">SMART HOME &amp; WELLNESS</text>
+  <!-- Small decorative leaf icon -->
+  <path d="M180 14 C180 14 192 10 194 22 C194 22 182 26 180 14 Z" fill="#7BAF82" opacity="0.8"/>
+  <path d="M183 14 L193 23" stroke="#4A7C59" stroke-width="1" fill="none"/>
+</svg>

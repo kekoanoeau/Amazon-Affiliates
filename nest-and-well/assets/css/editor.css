@@ -1,0 +1,150 @@
+/**
+ * Nest & Well — Block Editor Styles
+ * Matches front-end brand styles in the WordPress block editor.
+ *
+ * @package nest-and-well
+ * @since 1.0.0
+ */
+
+:root {
+    --forest:     #1A3C34;
+    --sage:       #4A7C59;
+    --moss:       #7BAF82;
+    --amber:      #E8A23A;
+    --clay:       #C4634A;
+    --charcoal:   #2C2C2C;
+    --slate:      #4A6070;
+    --warm-white: #F5F2EE;
+    --lt-stone:   #EDE8E0;
+    --mid-stone:  #C9C1B4;
+    --white:      #FFFFFF;
+    --font-heading: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --font-display: Georgia, 'Times New Roman', serif;
+}
+
+/* Editor body */
+.editor-styles-wrapper {
+    background-color: var(--warm-white);
+    color: var(--charcoal);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+/* Headings */
+.editor-styles-wrapper h1,
+.editor-styles-wrapper h2,
+.editor-styles-wrapper h3,
+.editor-styles-wrapper h4,
+.editor-styles-wrapper h5,
+.editor-styles-wrapper h6 {
+    font-family: var(--font-heading);
+    color: var(--forest);
+    font-weight: 700;
+}
+
+.editor-styles-wrapper h2 {
+    border-bottom: 2px solid var(--lt-stone);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.editor-styles-wrapper h3 {
+    color: var(--sage);
+}
+
+/* Links */
+.editor-styles-wrapper a {
+    color: var(--sage);
+}
+
+/* Blockquote */
+.editor-styles-wrapper blockquote {
+    border-left: 4px solid var(--amber);
+    background-color: var(--lt-stone);
+    padding: 16px 20px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--forest);
+    margin: 24px 0;
+}
+
+/* Tables */
+.editor-styles-wrapper table th {
+    background-color: var(--forest);
+    color: var(--white);
+    font-weight: 700;
+    padding: 8px 16px;
+}
+
+.editor-styles-wrapper table td {
+    padding: 8px 16px;
+    border: 1px solid var(--mid-stone);
+}
+
+.editor-styles-wrapper table tr:nth-child(even) td {
+    background-color: var(--lt-stone);
+}
+
+/* Strong */
+.editor-styles-wrapper strong {
+    color: var(--forest);
+    font-weight: 700;
+}
+
+/* Images */
+.editor-styles-wrapper img {
+    border-radius: 4px;
+}
+
+.editor-styles-wrapper figcaption {
+    color: var(--slate);
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* Pullquote */
+.editor-styles-wrapper .wp-block-pullquote {
+    border-top: 1px solid var(--mid-stone);
+    border-bottom: 1px solid var(--mid-stone);
+    border-left: none;
+    border-right: none;
+}
+
+.editor-styles-wrapper .wp-block-pullquote blockquote {
+    border-left: none;
+    background: transparent;
+    text-align: center;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--forest);
+    font-family: var(--font-display);
+    padding: 16px;
+}
+
+/* Separator */
+.editor-styles-wrapper hr,
+.editor-styles-wrapper .wp-block-separator {
+    border: none;
+    border-top: 1px solid var(--mid-stone);
+    margin: 32px 0;
+}
+
+/* Code */
+.editor-styles-wrapper code,
+.editor-styles-wrapper pre {
+    background-color: var(--lt-stone);
+    border: 1px solid var(--mid-stone);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.editor-styles-wrapper code {
+    padding: 2px 6px;
+}
+
+.editor-styles-wrapper pre {
+    padding: 16px;
+    overflow-x: auto;
+}
