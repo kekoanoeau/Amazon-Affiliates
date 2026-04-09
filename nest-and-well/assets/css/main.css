@@ -356,6 +356,7 @@ em, i { font-style: italic; }
 #content { flex: 1; }
 
 .site-main { padding: var(--space-2xl) 0; }
+.site-main--home { padding-top: 0; }
 
 .content-sidebar-wrap {
     display: flex;
