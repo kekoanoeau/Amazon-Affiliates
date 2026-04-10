@@ -1173,10 +1173,12 @@ em, i { font-style: italic; }
 /* Variant: Best Value — 3px moss top border */
 .article-card--best-value     { border-top: 3px solid var(--moss); }
 
+/* Image wrap — bleeds edge-to-edge out of the body padding */
 .article-card__image-wrap {
     position: relative;
     overflow: hidden;
     aspect-ratio: 16/9;
+    margin: 0 calc(-1 * var(--space-lg)) var(--space-md);
 }
 .article-card__image-link { display: block; width: 100%; height: 100%; }
 .article-card__image {
@@ -1192,28 +1194,9 @@ em, i { font-style: italic; }
     width: 100%;
     height: 100%;
     background: var(--lt-stone);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--mid-stone);
-    font-size: 40px;
 }
 
-/* Category badge — overlaid on image */
-.article-card__cat-badge {
-    position: absolute;
-    top: var(--space-sm);
-    left: var(--space-sm);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    text-decoration: none;
-    line-height: 1;
-    z-index: 2;
-}
-
+/* Review badge overlaid on image */
 .article-card__review-badge {
     position: absolute;
     top: var(--space-sm);
@@ -1229,14 +1212,11 @@ em, i { font-style: italic; }
 }
 
 .article-card__title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--forest);
-    margin-bottom: var(--space-sm);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin-bottom: var(--space-md);
+    line-height: 1.35;
 }
 .article-card__title-link {
     color: inherit;
@@ -1256,19 +1236,6 @@ em, i { font-style: italic; }
     flex: 1;
 }
 
-.article-card__meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 13px;
-    color: var(--slate);
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
-}
-.article-card__author { font-weight: 500; color: var(--slate); }
-.article-card__sep    { color: var(--mid-stone); }
-.article-card__date, .article-card__read-time { color: var(--slate); }
-
 .article-card__bottom {
     display: flex;
     align-items: center;
@@ -1276,6 +1243,8 @@ em, i { font-style: italic; }
     margin-top: auto;
     padding-top: var(--space-md);
     border-top: 1px solid var(--lt-stone);
+    gap: var(--space-sm);
+    flex-wrap: wrap;
 }
 
 .article-card__actions {
@@ -1295,6 +1264,14 @@ em, i { font-style: italic; }
     font-size: 14px;
     font-weight: 700;
     color: var(--forest);
+}
+
+/* "CHECK IT OUT" CTA inside card — compact amber button */
+.article-card__cta.btn {
+    font-size: 11px;
+    padding: 9px 16px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
 }
 
 .article-card__read-link {
