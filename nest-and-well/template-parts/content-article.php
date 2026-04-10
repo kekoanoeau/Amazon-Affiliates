@@ -67,7 +67,7 @@ if ( 'editors-choice' === $review_badge ) {
 
         <!-- 3. Excerpt -->
         <p class="article-card__excerpt">
-            <?php echo esc_html( wp_trim_words( get_the_excerpt(), 20, '&hellip;' ) ); ?>
+            <?php echo esc_html( wp_trim_words( get_the_excerpt(), 30, '&hellip;' ) ); ?>
         </p>
 
         <!-- 4. Rating + Actions -->

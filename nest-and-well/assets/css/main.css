@@ -1216,6 +1216,12 @@ em, i { font-style: italic; }
     margin-bottom: var(--space-md);
     line-height: 1.35;
     text-align: center;
+    /* Clamp to 2 lines + reserve minimum 2-line height so images stay aligned */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(17px * 1.35 * 2);
 }
 .article-card__title-link {
     color: inherit;
@@ -1228,10 +1234,6 @@ em, i { font-style: italic; }
     color: var(--charcoal);
     line-height: 1.6;
     margin-bottom: var(--space-md);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     flex: 1;
 }
 
@@ -2464,26 +2466,25 @@ em, i { font-style: italic; }
     padding: var(--space-2xl) 0 var(--space-3xl);
 }
 
+/* CSS Grid — equal columns with no gap-math rounding errors */
 .hp-feed__grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-lg);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+    align-items: start;   /* each row's height driven by its tallest card */
 }
 
-/* Each flex item — 3 columns with consistent gap math */
 .flex-item.homepage-style-item {
-    flex: 0 0 calc(33.333% - var(--space-lg) * 2 / 3);
-    min-width: 0;                   /* prevent overflow */
+    min-width: 0;
     display: flex;
     flex-direction: column;
 }
 
-/* Stretch card to fill the item height */
+/* Card fills its grid cell vertically */
 .flex-item.homepage-style-item .article-card {
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .flex-item.homepage-style-item .article-card__body {
@@ -2553,16 +2554,12 @@ em, i { font-style: italic; }
 
 /* — Tablet: 2 columns — */
 @media (max-width: 1023px) {
-    .flex-item.homepage-style-item {
-        flex: 0 0 calc(50% - var(--space-lg) / 2);
-    }
+    .hp-feed__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* — Mobile: 1 column — */
 @media (max-width: 599px) {
-    .flex-item.homepage-style-item {
-        flex: 0 0 100%;
-    }
+    .hp-feed__grid { grid-template-columns: 1fr; }
 }
 
 /* ============================================================
