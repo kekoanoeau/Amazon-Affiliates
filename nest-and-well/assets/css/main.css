@@ -1157,15 +1157,13 @@ em, i { font-style: italic; }
    12. ARTICLE CARDS
    ============================================================ */
 .article-card {
-    background: var(--white);
-    border: 1px solid var(--mid-stone);
+    background: var(--warm-white);
+    border: none;
     border-radius: 0;
     display: flex;
     flex-direction: column;
-    transition: border-color var(--transition-fast);
     position: relative;
 }
-.article-card:hover { border-color: var(--sage); }
 .article-card:hover .article-card__title-link { color: var(--sage); }
 
 /* Variant: Editor's Choice — 3px amber top border */
@@ -1173,10 +1171,12 @@ em, i { font-style: italic; }
 /* Variant: Best Value — 3px moss top border */
 .article-card--best-value     { border-top: 3px solid var(--moss); }
 
+/* Image wrap — bleeds edge-to-edge out of the body padding */
 .article-card__image-wrap {
     position: relative;
     overflow: hidden;
     aspect-ratio: 16/9;
+    margin: 0 calc(-1 * var(--space-lg)) var(--space-md);
 }
 .article-card__image-link { display: block; width: 100%; height: 100%; }
 .article-card__image {
@@ -1192,28 +1192,9 @@ em, i { font-style: italic; }
     width: 100%;
     height: 100%;
     background: var(--lt-stone);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--mid-stone);
-    font-size: 40px;
 }
 
-/* Category badge — overlaid on image */
-.article-card__cat-badge {
-    position: absolute;
-    top: var(--space-sm);
-    left: var(--space-sm);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    text-decoration: none;
-    line-height: 1;
-    z-index: 2;
-}
-
+/* Review badge overlaid on image */
 .article-card__review-badge {
     position: absolute;
     top: var(--space-sm);
@@ -1229,14 +1210,18 @@ em, i { font-style: italic; }
 }
 
 .article-card__title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--forest);
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
+    line-height: 1.35;
+    text-align: center;
+    /* Clamp to 2 lines + reserve minimum 2-line height so images stay aligned */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: calc(17px * 1.35 * 2);
 }
 .article-card__title-link {
     color: inherit;
@@ -1249,25 +1234,8 @@ em, i { font-style: italic; }
     color: var(--charcoal);
     line-height: 1.6;
     margin-bottom: var(--space-md);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     flex: 1;
 }
-
-.article-card__meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 13px;
-    color: var(--slate);
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
-}
-.article-card__author { font-weight: 500; color: var(--slate); }
-.article-card__sep    { color: var(--mid-stone); }
-.article-card__date, .article-card__read-time { color: var(--slate); }
 
 .article-card__bottom {
     display: flex;
@@ -1276,15 +1244,11 @@ em, i { font-style: italic; }
     margin-top: auto;
     padding-top: var(--space-md);
     border-top: 1px solid var(--lt-stone);
+    gap: var(--space-sm);
 }
 
-.article-card__actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+/* Share group anchors to far left; CTA anchors to far right */
+.article-card__bottom .article-card__cta { margin-left: auto; }
 
 .article-card__rating {
     display: flex;
@@ -1295,6 +1259,14 @@ em, i { font-style: italic; }
     font-size: 14px;
     font-weight: 700;
     color: var(--forest);
+}
+
+/* "CHECK IT OUT" CTA inside card — compact amber button */
+.article-card__cta.btn {
+    font-size: 11px;
+    padding: 9px 16px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
 }
 
 .article-card__read-link {
@@ -2488,7 +2460,110 @@ em, i { font-style: italic; }
 .utility-bar__account-link:hover { color: var(--amber); text-decoration: none; }
 
 /* ============================================================
-   26. RESPONSIVE BREAKPOINTS
+   26. HOMEPAGE FEED — 3-COLUMN INFINITE SCROLL
+   ============================================================ */
+.hp-feed {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+}
+
+/* CSS Grid — equal columns with no gap-math rounding errors */
+.hp-feed__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+    align-items: start;   /* each row's height driven by its tallest card */
+}
+
+.flex-item.homepage-style-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card fills its grid cell vertically */
+.flex-item.homepage-style-item .article-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-item.homepage-style-item .article-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-item.homepage-style-item .article-card__bottom {
+    margin-top: auto;
+}
+
+/* Sentinel — invisible spacer observed by IntersectionObserver */
+.hp-feed__sentinel {
+    width: 100%;
+    height: 1px;
+    margin-top: var(--space-xl);
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Loading indicator */
+.hp-feed__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl) 0;
+    color: var(--slate);
+    font-size: 14px;
+}
+
+.hp-feed__spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--lt-stone);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: hpSpin 0.7s linear infinite;
+}
+
+@keyframes hpSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* End-of-feed message */
+.hp-feed__end {
+    text-align: center;
+    padding: var(--space-2xl) 0 var(--space-lg);
+}
+
+.hp-feed__end p {
+    font-size: 14px;
+    color: var(--slate);
+    font-style: italic;
+    margin: 0;
+}
+
+.hp-feed__no-posts {
+    color: var(--slate);
+    padding: var(--space-2xl) 0;
+    text-align: center;
+    width: 100%;
+}
+
+/* — Tablet: 2 columns — */
+@media (max-width: 1023px) {
+    .hp-feed__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* — Mobile: 1 column — */
+@media (max-width: 599px) {
+    .hp-feed__grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   27. RESPONSIVE BREAKPOINTS
    Mobile-first: base = mobile, add features at larger sizes
    Mobile-first: base = mobile, add features at larger sizes
    ============================================================ */
