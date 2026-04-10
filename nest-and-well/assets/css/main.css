@@ -1245,8 +1245,7 @@ em, i { font-style: italic; }
     gap: var(--space-sm);
 }
 
-/* Save btn anchors to far left; CTA anchors to far right via space-between */
-.article-card__bottom .save-article-btn { order: -1; }
+/* Share group anchors to far left; CTA anchors to far right */
 .article-card__bottom .article-card__cta { margin-left: auto; }
 
 .article-card__rating {

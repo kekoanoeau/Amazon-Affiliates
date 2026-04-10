@@ -16,7 +16,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $post_id      = get_the_ID();
-$review_score = get_post_meta( $post_id, '_review_score', true );
+$review_score = (float) get_post_meta( $post_id, '_review_score', true );
 $review_badge = get_post_meta( $post_id, '_review_badge', true );
 
 // Card variant classes
@@ -73,13 +73,26 @@ if ( 'editors-choice' === $review_badge ) {
         <!-- 4. Rating + Actions -->
         <div class="article-card__bottom">
 
-            <!-- Far left: Save button -->
-            <button class="save-article-btn<?php echo nest_well_is_post_saved( $post_id ) ? ' is-saved' : ''; ?>"
-                    data-post-id="<?php echo esc_attr( $post_id ); ?>"
-                    aria-label="<?php echo nest_well_is_post_saved( $post_id ) ? esc_attr__( 'Remove from saved', 'nest-and-well' ) : esc_attr__( 'Save article', 'nest-and-well' ); ?>">
-                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                <span class="save-btn__label"><?php echo nest_well_is_post_saved( $post_id ) ? esc_html__( 'Saved', 'nest-and-well' ) : esc_html__( 'Save', 'nest-and-well' ); ?></span>
-            </button>
+            <!-- Far left: Social share -->
+            <div class="share-buttons article-card__share" aria-label="<?php esc_attr_e( 'Share this article', 'nest-and-well' ); ?>">
+                <a href="https://pinterest.com/pin/create/button/?url=<?php echo rawurlencode( get_permalink() ); ?>&description=<?php echo rawurlencode( get_the_title() ); ?>"
+                   class="share-buttons__item share-buttons__item--pinterest"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="<?php esc_attr_e( 'Share on Pinterest', 'nest-and-well' ); ?>">P</a>
+
+                <a href="https://twitter.com/intent/tweet?url=<?php echo rawurlencode( get_permalink() ); ?>&text=<?php echo rawurlencode( get_the_title() ); ?>"
+                   class="share-buttons__item share-buttons__item--twitter"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="<?php esc_attr_e( 'Share on X', 'nest-and-well' ); ?>">X</a>
+
+                <button class="share-buttons__item share-buttons__item--copy"
+                        data-copy-url="<?php echo esc_attr( get_permalink() ); ?>"
+                        aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
+                    <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
+                </button>
+            </div>
 
             <!-- Middle: Star rating (when present) -->
             <?php if ( $review_score ) : ?>

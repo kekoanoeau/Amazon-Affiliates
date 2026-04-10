@@ -74,19 +74,6 @@
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </button>
-
-                    <?php if ( is_user_logged_in() ) : ?>
-                    <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>" class="utility-bar__account-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <?php esc_html_e( 'Account', 'nest-and-well' ); ?>
-                        <?php nest_well_saved_count_badge(); ?>
-                    </a>
-                    <?php else : ?>
-                    <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>" class="utility-bar__account-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <?php esc_html_e( 'Log In', 'nest-and-well' ); ?>
-                    </a>
-                    <?php endif; ?>
                 </div>
 
             </div><!-- .utility-bar__inner -->
