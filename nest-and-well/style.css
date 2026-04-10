@@ -20,6 +20,7 @@ Tags: affiliate, reviews, smart-home, wellness, blog
 :root {
     /* Brand Colors */
     --forest:     #1A3C34;
+    --pine:       #2E6B50;   /* stripe-1 accent — distinct from --forest header/hero */
     --sage:       #4A7C59;
     --moss:       #7BAF82;
     --amber:      #E8A23A;
@@ -344,6 +345,10 @@ hr {
 
 .site-main {
     padding: var(--space-2xl) 0;
+}
+
+.site-main--home {
+    padding-top: 0;
 }
 
 /* Two-column layout for single posts */

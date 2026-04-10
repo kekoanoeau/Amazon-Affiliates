@@ -397,7 +397,75 @@
   }
 
   // ============================================================
-  // 8. Active Navigation State
+  // 8. Stripe Nav Dropdowns
+  // ============================================================
+  function initStripeNavDropdowns() {
+    var stripeItems = $$('.stripe-nav__item.has-dropdown');
+
+    stripeItems.forEach(function (item) {
+      var toggle = item.querySelector('.stripe-nav__toggle');
+      var dropdown = item.querySelector('.stripe-nav__dropdown');
+
+      if (!toggle || !dropdown) return;
+
+      function openDropdown() {
+        dropdown.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+        item.classList.add('is-expanded');
+      }
+
+      function closeDropdown() {
+        dropdown.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        item.classList.remove('is-expanded');
+      }
+
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = toggle.getAttribute('aria-expanded') === 'true';
+        // Close all other open dropdowns first
+        $$('.stripe-nav__item.has-dropdown.is-expanded').forEach(function (other) {
+          if (other !== item) {
+            other.querySelector('.stripe-nav__dropdown').hidden = true;
+            other.querySelector('.stripe-nav__toggle').setAttribute('aria-expanded', 'false');
+            other.classList.remove('is-expanded');
+          }
+        });
+        if (isOpen) {
+          closeDropdown();
+        } else {
+          openDropdown();
+        }
+      });
+
+      // Close on Escape key
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && item.classList.contains('is-expanded')) {
+          closeDropdown();
+          toggle.focus();
+        }
+      });
+    });
+
+    // Click outside closes all dropdowns
+    document.addEventListener('click', function () {
+      $$('.stripe-nav__item.has-dropdown.is-expanded').forEach(function (item) {
+        item.querySelector('.stripe-nav__dropdown').hidden = true;
+        item.querySelector('.stripe-nav__toggle').setAttribute('aria-expanded', 'false');
+        item.classList.remove('is-expanded');
+      });
+    });
+
+    // Prevent clicks inside dropdown from closing it
+    $$('.stripe-nav__dropdown').forEach(function (dropdown) {
+      dropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    });
+  }
+
+  // ============================================================
+  // 9. Active Navigation State
   // ============================================================
   function initActiveNav() {
     var currentPath = window.location.pathname;
@@ -423,6 +491,7 @@
     initLoadMore();
     initFaqAccordion();
     initCopyLink();
+    initStripeNavDropdowns();
     initActiveNav();
   }
 
