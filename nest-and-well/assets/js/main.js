@@ -173,7 +173,91 @@
   }
 
   // ============================================================
-  // 5. Load More (REST API)
+  // 5. Homepage Infinite Scroll (IntersectionObserver)
+  // ============================================================
+  function initInfiniteScroll() {
+    var sentinel = $('.js-infinite-sentinel');
+    var grid     = $('#hp-feed-grid');
+    var loading  = $('.js-infinite-loading');
+    var endMsg   = $('.js-infinite-end');
+
+    if (!sentinel || !grid) return;
+    if (!('IntersectionObserver' in window)) return; // graceful no-op for old browsers
+
+    var isFetching = false;
+
+    function fetchNextPage() {
+      var page       = parseInt(sentinel.dataset.page, 10);
+      var perPage    = parseInt(sentinel.dataset.perPage || '12', 10);
+      var totalPages = parseInt(sentinel.dataset.totalPages || '1', 10);
+
+      if (isFetching || page > totalPages) return;
+      isFetching = true;
+
+      if (loading) { loading.hidden = false; loading.setAttribute('aria-busy', 'true'); }
+
+      var apiUrl = (window.nestWellData && window.nestWellData.restUrl)
+        ? window.nestWellData.restUrl + 'wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1'
+        : '/wp-json/wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1';
+
+      fetch(apiUrl, {
+        headers: { 'X-WP-Nonce': (window.nestWellData && window.nestWellData.restNonce) || '' },
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Network error');
+          var wpTotal = parseInt(res.headers.get('X-WP-TotalPages') || '1', 10);
+          sentinel.dataset.totalPages = String(wpTotal);
+          return res.json();
+        })
+        .then(function (posts) {
+          if (!posts || !posts.length) {
+            sentinel.remove();
+            if (endMsg) endMsg.hidden = false;
+            return;
+          }
+
+          var frag = document.createDocumentFragment();
+          posts.forEach(function (post) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'flex-item homepage-style-item';
+            wrapper.innerHTML = buildPostCard(post);
+            frag.appendChild(wrapper);
+          });
+          grid.appendChild(frag);
+
+          var nextPage = page + 1;
+          sentinel.dataset.page = String(nextPage);
+
+          if (nextPage > parseInt(sentinel.dataset.totalPages, 10)) {
+            sentinel.remove();
+            if (endMsg) endMsg.hidden = false;
+          }
+        })
+        .catch(function (err) {
+          console.error('Infinite scroll error:', err);
+        })
+        .finally(function () {
+          isFetching = false;
+          if (loading) { loading.hidden = true; loading.setAttribute('aria-busy', 'false'); }
+        });
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            fetchNextPage();
+          }
+        });
+      },
+      { rootMargin: '200px' }  // start loading 200px before sentinel hits viewport
+    );
+
+    observer.observe(sentinel);
+  }
+
+  // ============================================================
+  // 6. Load More Button (non-homepage pages: archive, search)
   // ============================================================
   function initLoadMore() {
     var loadMoreBtn = $('.js-load-more');
@@ -488,6 +572,7 @@
     initMobileMenu();
     initSearchToggle();
     initTabFilter();
+    initInfiniteScroll();
     initLoadMore();
     initFaqAccordion();
     initCopyLink();
