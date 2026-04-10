@@ -121,7 +121,7 @@ if ( 'editors-choice' === $review_badge ) {
             <?php endif; ?>
         </div>
 
-        <!-- Bottom Row: Rating + Read Link -->
+        <!-- Bottom Row: Rating + Read Link + Save -->
         <div class="article-card__bottom">
             <div class="article-card__rating">
                 <?php if ( $review_score ) : ?>
@@ -129,9 +129,17 @@ if ( 'editors-choice' === $review_badge ) {
                 <span class="article-card__score"><?php echo esc_html( $review_score ); ?>/10</span>
                 <?php endif; ?>
             </div>
-            <a href="<?php the_permalink(); ?>" class="article-card__read-link">
-                <?php esc_html_e( 'Read Review', 'nest-and-well' ); ?> &rarr;
-            </a>
+            <div class="article-card__actions">
+                <a href="<?php the_permalink(); ?>" class="article-card__read-link">
+                    <?php esc_html_e( 'Read Review', 'nest-and-well' ); ?> &rarr;
+                </a>
+                <button class="save-article-btn<?php echo nest_well_is_post_saved( $post_id ) ? ' is-saved' : ''; ?>"
+                        data-post-id="<?php echo esc_attr( $post_id ); ?>"
+                        aria-label="<?php echo nest_well_is_post_saved( $post_id ) ? esc_attr__( 'Remove from saved', 'nest-and-well' ) : esc_attr__( 'Save article', 'nest-and-well' ); ?>">
+                    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <span class="save-btn__label"><?php echo nest_well_is_post_saved( $post_id ) ? esc_html__( 'Saved', 'nest-and-well' ) : esc_html__( 'Save', 'nest-and-well' ); ?></span>
+                </button>
+            </div>
         </div>
 
     </div><!-- .article-card__body -->
