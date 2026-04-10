@@ -1157,15 +1157,13 @@ em, i { font-style: italic; }
    12. ARTICLE CARDS
    ============================================================ */
 .article-card {
-    background: var(--white);
-    border: 1px solid var(--mid-stone);
+    background: var(--warm-white);
+    border: none;
     border-radius: 0;
     display: flex;
     flex-direction: column;
-    transition: border-color var(--transition-fast);
     position: relative;
 }
-.article-card:hover { border-color: var(--sage); }
 .article-card:hover .article-card__title-link { color: var(--sage); }
 
 /* Variant: Editor's Choice — 3px amber top border */
@@ -1217,6 +1215,7 @@ em, i { font-style: italic; }
     color: var(--forest);
     margin-bottom: var(--space-md);
     line-height: 1.35;
+    text-align: center;
 }
 .article-card__title-link {
     color: inherit;
@@ -1244,16 +1243,11 @@ em, i { font-style: italic; }
     padding-top: var(--space-md);
     border-top: 1px solid var(--lt-stone);
     gap: var(--space-sm);
-    flex-wrap: wrap;
 }
 
-.article-card__actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+/* Save btn anchors to far left; CTA anchors to far right via space-between */
+.article-card__bottom .save-article-btn { order: -1; }
+.article-card__bottom .article-card__cta { margin-left: auto; }
 
 .article-card__rating {
     display: flex;

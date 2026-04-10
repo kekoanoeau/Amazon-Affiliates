@@ -72,23 +72,28 @@ if ( 'editors-choice' === $review_badge ) {
 
         <!-- 4. Rating + Actions -->
         <div class="article-card__bottom">
+
+            <!-- Far left: Save button -->
+            <button class="save-article-btn<?php echo nest_well_is_post_saved( $post_id ) ? ' is-saved' : ''; ?>"
+                    data-post-id="<?php echo esc_attr( $post_id ); ?>"
+                    aria-label="<?php echo nest_well_is_post_saved( $post_id ) ? esc_attr__( 'Remove from saved', 'nest-and-well' ) : esc_attr__( 'Save article', 'nest-and-well' ); ?>">
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <span class="save-btn__label"><?php echo nest_well_is_post_saved( $post_id ) ? esc_html__( 'Saved', 'nest-and-well' ) : esc_html__( 'Save', 'nest-and-well' ); ?></span>
+            </button>
+
+            <!-- Middle: Star rating (when present) -->
+            <?php if ( $review_score ) : ?>
             <div class="article-card__rating">
-                <?php if ( $review_score ) : ?>
                 <?php echo wp_kses_post( nest_well_star_rating_html( (float) $review_score ) ); ?>
                 <span class="article-card__score"><?php echo esc_html( number_format( (float) $review_score, 1 ) ); ?>/10</span>
-                <?php endif; ?>
             </div>
-            <div class="article-card__actions">
-                <a href="<?php the_permalink(); ?>" class="article-card__cta btn btn--primary">
-                    <?php esc_html_e( 'CHECK IT OUT', 'nest-and-well' ); ?>
-                </a>
-                <button class="save-article-btn<?php echo nest_well_is_post_saved( $post_id ) ? ' is-saved' : ''; ?>"
-                        data-post-id="<?php echo esc_attr( $post_id ); ?>"
-                        aria-label="<?php echo nest_well_is_post_saved( $post_id ) ? esc_attr__( 'Remove from saved', 'nest-and-well' ) : esc_attr__( 'Save article', 'nest-and-well' ); ?>">
-                    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                    <span class="save-btn__label"><?php echo nest_well_is_post_saved( $post_id ) ? esc_html__( 'Saved', 'nest-and-well' ) : esc_html__( 'Save', 'nest-and-well' ); ?></span>
-                </button>
-            </div>
+            <?php endif; ?>
+
+            <!-- Far right: CTA -->
+            <a href="<?php the_permalink(); ?>" class="article-card__cta btn btn--primary">
+                <?php esc_html_e( 'CHECK IT OUT', 'nest-and-well' ); ?>
+            </a>
+
         </div>
 
     </div><!-- .article-card__body -->
