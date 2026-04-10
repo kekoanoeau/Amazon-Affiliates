@@ -815,7 +815,7 @@ em, i { font-style: italic; }
 
 .stripe-nav__item {
     flex: 1;
-    position: relative;   /* anchor for dropdown */
+    position: relative;   /* anchor for absolute dropdown */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -825,9 +825,20 @@ em, i { font-style: italic; }
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    transition: filter var(--transition-fast);
+    /* NOTE: do NOT use filter here — filter creates a new stacking context
+       that breaks the dropdown z-index on browsers that enforce it */
 }
-.stripe-nav__item:hover { filter: brightness(0.9); }
+/* Hover: darken via pseudo-element overlay so stacking context is not affected */
+.stripe-nav__item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background var(--transition-fast);
+    pointer-events: none;
+    z-index: 0;
+}
+.stripe-nav__item:hover::before { background: rgba(0,0,0,0.12); }
 
 /* Stripe label — the main clickable link */
 .stripe-nav__label {
@@ -839,6 +850,8 @@ em, i { font-style: italic; }
     justify-content: center;
     height: 100%;
     padding: 0 var(--space-sm);
+    position: relative;
+    z-index: 1;  /* above ::before overlay */
 }
 .stripe-nav__label:hover { color: var(--white); text-decoration: none; }
 
@@ -852,7 +865,9 @@ em, i { font-style: italic; }
     height: 100%;
     display: flex;
     align-items: center;
-    transition: color var(--transition-fast), transform var(--transition-fast);
+    transition: color var(--transition-fast);
+    position: relative;
+    z-index: 1;  /* above ::before overlay */
 }
 .stripe-nav__toggle:hover { color: var(--white); }
 .stripe-nav__toggle[aria-expanded="true"] .stripe-nav__chevron {
@@ -864,12 +879,16 @@ em, i { font-style: italic; }
     position: absolute;
     top: 100%;
     left: 0;
-    min-width: 180px;
-    background-color: var(--stripe-color, var(--forest));
-    filter: brightness(0.88);  /* slightly darker than the stripe */
-    z-index: 200;
+    min-width: 200px;
+    /* Darken with a direct color instead of filter (filter creates stacking context) */
+    background-color: color-mix(in srgb, var(--stripe-color, var(--forest)) 88%, black);
+    z-index: 500;  /* well above site-header z-index: 100 */
     border-top: 2px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+/* Browsers that don't support color-mix: fallback to a translucent dark overlay */
+@supports not (background-color: color-mix(in srgb, red 50%, black)) {
+    .stripe-nav__dropdown { background-color: var(--forest); }
 }
 .stripe-nav__dropdown[hidden] { display: none; }
 .stripe-nav__dropdown-list {
@@ -2647,7 +2666,9 @@ em, i { font-style: italic; }
     .home-hero__ctas { flex-direction: column; }
     .home-hero__ctas .btn { text-align: center; }
 
-    /* 5-stripe nav: horizontal scroll on mobile */
+    /* 5-stripe nav: horizontal scroll on mobile.
+       overflow-x: auto implicitly sets overflow-y: clip which would cut off
+       the dropdown panels — hide toggles on mobile so only tap-to-navigate works. */
     .stripe-nav__inner {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -2656,6 +2677,8 @@ em, i { font-style: italic; }
         justify-content: flex-start;
     }
     .stripe-nav__inner::-webkit-scrollbar { display: none; }
+    .stripe-nav__toggle,
+    .stripe-nav__dropdown { display: none !important; }
     .stripe-nav__item {
         flex: 0 0 auto;
         min-width: 120px;

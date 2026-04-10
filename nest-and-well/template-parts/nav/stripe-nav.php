@@ -21,9 +21,10 @@ function nest_well_slug_from_url( $url ) {
 }
 
 /**
- * Get child category links for a given parent slug.
+ * Get child links for a stripe — checks child categories first,
+ * then falls back to child WordPress Pages matching the same slug.
  *
- * @param string $slug Parent category slug.
+ * @param string $slug Parent category/page slug.
  * @return array[] Array of ['name', 'url'] for each child.
  */
 function nest_well_get_stripe_children( $slug ) {
@@ -31,27 +32,52 @@ function nest_well_get_stripe_children( $slug ) {
         return array();
     }
 
-    $parent = get_term_by( 'slug', $slug, 'category' );
-    if ( ! $parent || is_wp_error( $parent ) ) {
-        return array();
+    // 1. Try child categories.
+    $parent_term = get_term_by( 'slug', $slug, 'category' );
+    if ( $parent_term && ! is_wp_error( $parent_term ) ) {
+        $cat_children = get_categories( array(
+            'parent'     => $parent_term->term_id,
+            'hide_empty' => false,
+            'number'     => 8,
+            'orderby'    => 'count',
+            'order'      => 'DESC',
+        ) );
+
+        if ( ! empty( $cat_children ) ) {
+            $items = array();
+            foreach ( $cat_children as $child ) {
+                $items[] = array(
+                    'name' => $child->name,
+                    'url'  => get_term_link( $child ),
+                );
+            }
+            return $items;
+        }
     }
 
-    $children = get_categories( array(
-        'parent'     => $parent->term_id,
-        'hide_empty' => false,
-        'number'     => 8,
-        'orderby'    => 'count',
-        'order'      => 'DESC',
-    ) );
+    // 2. Fallback: child Pages whose parent matches this slug.
+    $parent_page = get_page_by_path( $slug );
+    if ( $parent_page ) {
+        $page_children = get_pages( array(
+            'parent'      => $parent_page->ID,
+            'post_status' => 'publish',
+            'number'      => 8,
+            'sort_column' => 'menu_order,post_title',
+        ) );
 
-    $items = array();
-    foreach ( $children as $child ) {
-        $items[] = array(
-            'name' => $child->name,
-            'url'  => get_term_link( $child ),
-        );
+        if ( ! empty( $page_children ) ) {
+            $items = array();
+            foreach ( $page_children as $page ) {
+                $items[] = array(
+                    'name' => $page->post_title,
+                    'url'  => get_permalink( $page->ID ),
+                );
+            }
+            return $items;
+        }
     }
-    return $items;
+
+    return array();
 }
 
 // Stripe 1 uses --pine (distinct dark teal) instead of --forest
