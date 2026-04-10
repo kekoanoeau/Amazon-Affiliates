@@ -2040,10 +2040,15 @@ em, i { font-style: italic; }
 .archive-hero {
     background: var(--white);
     padding: var(--space-xl) 0;
+    border-top: 4px solid var(--archive-accent, var(--forest));
     border-bottom: 1px solid var(--lt-stone);
     margin-bottom: var(--space-2xl);
 }
 .archive-header__title { margin-bottom: var(--space-sm); }
+.archive-header__title--category {
+    margin-bottom: var(--space-sm);
+    color: var(--archive-accent, var(--forest));
+}
 .archive-header__category-badge {
     display: inline-block;
     padding: 4px 14px;

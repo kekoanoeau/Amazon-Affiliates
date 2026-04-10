@@ -190,15 +190,19 @@
       var page       = parseInt(sentinel.dataset.page, 10);
       var perPage    = parseInt(sentinel.dataset.perPage || '12', 10);
       var totalPages = parseInt(sentinel.dataset.totalPages || '1', 10);
+      var categoryId = sentinel.dataset.categoryId || '';
 
       if (isFetching || page > totalPages) return;
       isFetching = true;
 
       if (loading) { loading.hidden = false; loading.setAttribute('aria-busy', 'true'); }
 
-      var apiUrl = (window.nestWellData && window.nestWellData.restUrl)
-        ? window.nestWellData.restUrl + 'wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1'
-        : '/wp-json/wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1';
+      var base = (window.nestWellData && window.nestWellData.restUrl)
+        ? window.nestWellData.restUrl + 'wp/v2/posts'
+        : '/wp-json/wp/v2/posts';
+
+      var apiUrl = base + '?per_page=' + perPage + '&page=' + page + '&_embed=1';
+      if (categoryId) apiUrl += '&categories=' + categoryId;
 
       fetch(apiUrl, {
         headers: { 'X-WP-Nonce': (window.nestWellData && window.nestWellData.restNonce) || '' },
