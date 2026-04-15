@@ -57,7 +57,7 @@ $total_pages = (int) $home_query->max_num_pages;
 		<!-- Loading indicator -->
 		<div class="hp-feed__loading js-infinite-loading" hidden aria-live="polite" aria-busy="false">
 			<span class="hp-feed__spinner" aria-hidden="true"></span>
-			<?php esc_html_e( 'Loading more reviews\u2026', 'nest-and-well' ); ?>
+			<?php esc_html_e( 'Good things take a moment\u2026', 'nest-and-well' ); ?>
 		</div>
 
 		<!-- End-of-feed message -->
