@@ -351,6 +351,10 @@ hr {
     padding-top: 0;
 }
 
+.site-main--single {
+    padding: 0;
+}
+
 /* Two-column layout for single posts */
 .content-sidebar-wrap {
     display: flex;

@@ -36,9 +36,6 @@ get_header();
     <div class="article-head">
         <div class="container">
 
-            <!-- Breadcrumbs -->
-            <?php nest_well_breadcrumbs(); ?>
-
             <!-- Article Title -->
             <h1 class="article-head__title"><?php the_title(); ?></h1>
 
