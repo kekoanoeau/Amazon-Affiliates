@@ -2464,6 +2464,36 @@ em, i { font-style: italic; }
 .utility-bar__account-link:hover { color: var(--amber); text-decoration: none; }
 
 /* ============================================================
+   26a. CATEGORY FEED PAGE TEMPLATE
+   ============================================================ */
+.site-main--category-feed { padding: 0; }
+
+.category-feed-hero {
+    background: var(--white);
+    padding: var(--space-xl) 0;
+    border-bottom: 1px solid var(--lt-stone);
+    margin-bottom: var(--space-2xl);
+}
+.category-feed-hero__title {
+    font-size: 32px;
+    font-family: var(--font-display);
+    color: var(--forest);
+    margin-bottom: var(--space-sm);
+    letter-spacing: -0.02em;
+}
+.category-feed-hero__desc {
+    color: var(--slate);
+    font-size: 15px;
+    max-width: 640px;
+    margin: 0;
+}
+.category-feed-hero__desc p { margin: 0; }
+
+@media (max-width: 767px) {
+    .category-feed-hero__title { font-size: 24px; }
+}
+
+/* ============================================================
    26. HOMEPAGE FEED — 3-COLUMN INFINITE SCROLL
    ============================================================ */
 .hp-feed {
