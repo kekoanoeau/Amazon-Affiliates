@@ -858,6 +858,10 @@ em, i { font-style: italic; }
 .stripe-nav__toggle[aria-expanded="true"] .stripe-nav__chevron {
     transform: rotate(180deg);
 }
+/* Lift expanded item so its dropdown stacks above sibling stripes */
+.stripe-nav__item.is-expanded {
+    z-index: 10;
+}
 
 /* Dropdown panel */
 .stripe-nav__dropdown {
@@ -1299,7 +1303,7 @@ em, i { font-style: italic; }
 
 .article-head {
     background: var(--white);
-    padding: var(--space-2xl) 0 var(--space-xl);
+    padding: 0 0 var(--space-xl);
     border-bottom: 1px solid var(--lt-stone);
     margin-bottom: var(--space-2xl);
 }
@@ -2651,6 +2655,8 @@ em, i { font-style: italic; }
         justify-content: flex-start;
     }
     .stripe-nav__inner::-webkit-scrollbar { display: none; }
+    /* Allow dropdown to escape the scrollable container when open */
+    .stripe-nav__inner.has-open-dropdown { overflow: visible; }
     .stripe-nav__item {
         flex: 0 0 auto;
         min-width: 120px;

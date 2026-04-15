@@ -169,9 +169,6 @@ get_header();
                 ?>
             </article>
 
-            <!-- Author Bio -->
-            <?php get_template_part( 'template-parts/author-bio' ); ?>
-
             <!-- Related Posts -->
             <?php get_template_part( 'template-parts/related-posts' ); ?>
 
