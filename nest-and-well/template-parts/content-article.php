@@ -4,8 +4,8 @@
  * Used in homepage grid, archives, related posts, and search results.
  *
  * Card structure:
- *   1. Title
- *   2. Featured Image
+ *   1. Featured Image (full card width, outside body)
+ *   2. Title
  *   3. Excerpt
  *   4. Rating + "CHECK IT OUT" / Save actions
  *
@@ -30,40 +30,40 @@ if ( 'editors-choice' === $review_badge ) {
 
 <article <?php post_class( $card_classes ); ?> id="post-<?php the_ID(); ?>">
 
+    <!-- 1. Featured Image (full card width, outside body padding) -->
+    <div class="article-card__image-wrap">
+        <a href="<?php the_permalink(); ?>" class="article-card__image-link" tabindex="-1" aria-hidden="true">
+            <?php if ( has_post_thumbnail() ) : ?>
+                <?php
+                the_post_thumbnail(
+                    'card-thumbnail',
+                    array(
+                        'class'   => 'article-card__image',
+                        'loading' => 'lazy',
+                        'alt'     => esc_attr( get_the_title() ),
+                    )
+                );
+                ?>
+            <?php else : ?>
+            <div class="article-card__image-placeholder" aria-hidden="true"></div>
+            <?php endif; ?>
+        </a>
+
+        <?php if ( $review_badge ) : ?>
+        <span class="article-card__review-badge badge badge--<?php echo esc_attr( $review_badge ); ?>">
+            <?php echo esc_html( nest_well_get_badge_label( $review_badge ) ); ?>
+        </span>
+        <?php endif; ?>
+    </div><!-- .article-card__image-wrap -->
+
     <div class="article-card__body">
 
-        <!-- 1. Title -->
+        <!-- 2. Title -->
         <h3 class="article-card__title">
             <a href="<?php the_permalink(); ?>" class="article-card__title-link">
                 <?php the_title(); ?>
             </a>
         </h3>
-
-        <!-- 2. Featured Image -->
-        <div class="article-card__image-wrap">
-            <a href="<?php the_permalink(); ?>" class="article-card__image-link" tabindex="-1" aria-hidden="true">
-                <?php if ( has_post_thumbnail() ) : ?>
-                    <?php
-                    the_post_thumbnail(
-                        'card-thumbnail',
-                        array(
-                            'class'   => 'article-card__image',
-                            'loading' => 'lazy',
-                            'alt'     => esc_attr( get_the_title() ),
-                        )
-                    );
-                    ?>
-                <?php else : ?>
-                <div class="article-card__image-placeholder" aria-hidden="true"></div>
-                <?php endif; ?>
-            </a>
-
-            <?php if ( $review_badge ) : ?>
-            <span class="article-card__review-badge badge badge--<?php echo esc_attr( $review_badge ); ?>">
-                <?php echo esc_html( nest_well_get_badge_label( $review_badge ) ); ?>
-            </span>
-            <?php endif; ?>
-        </div><!-- .article-card__image-wrap -->
 
         <!-- 3. Excerpt -->
         <p class="article-card__excerpt">
