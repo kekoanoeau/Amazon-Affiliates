@@ -13,6 +13,81 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Render the infinite-scroll article feed for a given category slug.
+ *
+ * Used by the dedicated per-category page templates. Looks up the
+ * category by slug, queries 12 posts per page, and outputs the same
+ * hp-feed grid structure as the homepage.
+ *
+ * @param string $category_slug  Category slug to filter by, or '' for all posts.
+ */
+function nest_well_render_category_feed( $category_slug = '' ) {
+    $category_id = 0;
+
+    if ( $category_slug ) {
+        $term = get_term_by( 'slug', $category_slug, 'category' );
+        if ( $term && ! is_wp_error( $term ) ) {
+            $category_id = (int) $term->term_id;
+        }
+    }
+
+    $query_args = array(
+        'post_type'           => 'post',
+        'posts_per_page'      => 12,
+        'ignore_sticky_posts' => true,
+        'post_status'         => 'publish',
+    );
+
+    if ( $category_id ) {
+        $query_args['cat'] = $category_id;
+    }
+
+    $feed_query  = new WP_Query( $query_args );
+    $total_pages = (int) $feed_query->max_num_pages;
+    ?>
+    <main id="main" class="site-main site-main--category-feed">
+        <div class="hp-feed container">
+
+            <div class="hp-feed__grid" id="hp-feed-grid">
+                <?php if ( $feed_query->have_posts() ) : ?>
+                    <?php while ( $feed_query->have_posts() ) : $feed_query->the_post(); ?>
+                    <div class="flex-item homepage-style-item">
+                        <?php get_template_part( 'template-parts/content-article' ); ?>
+                    </div>
+                    <?php endwhile; ?>
+                    <?php wp_reset_postdata(); ?>
+                <?php else : ?>
+                <p class="hp-feed__no-posts">
+                    <?php esc_html_e( 'No articles found. Check back soon!', 'nest-and-well' ); ?>
+                </p>
+                <?php endif; ?>
+            </div><!-- #hp-feed-grid -->
+
+            <?php if ( $total_pages > 1 ) : ?>
+            <div class="hp-feed__sentinel js-infinite-sentinel"
+                 aria-hidden="true"
+                 data-page="2"
+                 data-per-page="12"
+                 data-total-pages="<?php echo esc_attr( $total_pages ); ?>"
+                 <?php if ( $category_id ) : ?>data-category-id="<?php echo esc_attr( $category_id ); ?>"<?php endif; ?>>
+            </div>
+            <?php endif; ?>
+
+            <div class="hp-feed__loading js-infinite-loading" hidden aria-live="polite" aria-busy="false">
+                <span class="hp-feed__spinner" aria-hidden="true"></span>
+                <?php esc_html_e( 'Good things take a moment\u2026', 'nest-and-well' ); ?>
+            </div>
+
+            <div class="hp-feed__end js-infinite-end" hidden aria-live="polite">
+                <p><?php esc_html_e( "You've read everything. Nice work.", 'nest-and-well' ); ?></p>
+            </div>
+
+        </div><!-- .hp-feed -->
+    </main><!-- #main -->
+    <?php
+}
+
+/**
  * Register the meta box on page post type.
  */
 function nest_well_register_category_feed_meta_box() {
