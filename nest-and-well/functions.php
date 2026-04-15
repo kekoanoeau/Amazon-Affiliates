@@ -20,6 +20,7 @@ require_once NEST_WELL_DIR . '/inc/widgets.php';
 require_once NEST_WELL_DIR . '/inc/affiliate-helpers.php';
 require_once NEST_WELL_DIR . '/inc/seo-helpers.php';
 require_once NEST_WELL_DIR . '/inc/shortcodes.php';
+require_once NEST_WELL_DIR . '/inc/category-feed-meta.php';
 
 /**
  * Enqueue theme scripts and styles.

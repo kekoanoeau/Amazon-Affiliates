@@ -184,6 +184,7 @@
     if (!sentinel || !grid) return;
     if (!('IntersectionObserver' in window)) return; // graceful no-op for old browsers
 
+    var categoryId = sentinel.dataset.categoryId || '';
     var isFetching = false;
 
     function fetchNextPage() {
@@ -196,9 +197,11 @@
 
       if (loading) { loading.hidden = false; loading.setAttribute('aria-busy', 'true'); }
 
-      var apiUrl = (window.nestWellData && window.nestWellData.restUrl)
-        ? window.nestWellData.restUrl + 'wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1'
-        : '/wp-json/wp/v2/posts?per_page=' + perPage + '&page=' + page + '&_embed=1';
+      var base = (window.nestWellData && window.nestWellData.restUrl)
+        ? window.nestWellData.restUrl + 'wp/v2/posts'
+        : '/wp-json/wp/v2/posts';
+      var apiUrl = base + '?per_page=' + perPage + '&page=' + page + '&_embed=1';
+      if (categoryId) { apiUrl += '&categories=' + categoryId; }
 
       fetch(apiUrl, {
         headers: { 'X-WP-Nonce': (window.nestWellData && window.nestWellData.restNonce) || '' },
