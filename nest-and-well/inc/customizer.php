@@ -440,23 +440,6 @@ function nest_well_customizer_register( $wp_customize ) {
         )
     );
 
-    // Contact email
-    $wp_customize->add_setting(
-        'nest_well_contact_email',
-        array(
-            'default'           => 'hello@nestandwell.com',
-            'sanitize_callback' => 'sanitize_email',
-        )
-    );
-    $wp_customize->add_control(
-        'nest_well_contact_email',
-        array(
-            'label'   => esc_html__( 'Contact Email Address', 'nest-and-well' ),
-            'section' => 'nest_well_footer',
-            'type'    => 'email',
-        )
-    );
-
     // Social URLs
     $social_networks = array(
         'pinterest'  => 'Pinterest',
