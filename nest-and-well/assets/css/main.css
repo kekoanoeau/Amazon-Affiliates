@@ -630,6 +630,60 @@ em, i { font-style: italic; }
     gap: var(--space-md);
 }
 
+/* Inline search wrap — expands leftward from the icon */
+.utility-bar__search-wrap {
+    display: flex;
+    align-items: center;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-width 0.28s ease, opacity 0.2s ease;
+}
+.utility-bar__search-wrap.is-open {
+    max-width: 280px;
+    opacity: 1;
+}
+
+.utility-bar__search-form {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    padding: 4px 4px 4px 14px;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.utility-bar__search-input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--warm-white);
+    font-size: 14px;
+    width: 160px;
+    min-width: 0;
+    font-family: inherit;
+}
+.utility-bar__search-input::placeholder { color: rgba(255,255,255,0.45); }
+
+.utility-bar__search-submit {
+    flex-shrink: 0;
+    background: var(--sage);
+    border: none;
+    border-radius: 999px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.utility-bar__search-submit:hover { background: var(--moss); }
+
+/* Toggle button — swaps search ↔ close icon based on aria-expanded */
 .utility-bar__search-toggle {
     background: none;
     border: none;
@@ -642,6 +696,9 @@ em, i { font-style: italic; }
 }
 .utility-bar__search-toggle:hover { color: var(--moss); }
 .utility-bar__search-icon { display: block; }
+.utility-bar__search-icon--close { display: none; }
+.utility-bar__search-toggle[aria-expanded="true"] .utility-bar__search-icon--search { display: none; }
+.utility-bar__search-toggle[aria-expanded="true"] .utility-bar__search-icon--close { display: block; }
 
 .utility-bar__account-link {
     color: var(--moss);
@@ -649,38 +706,6 @@ em, i { font-style: italic; }
     text-decoration: none;
 }
 .utility-bar__account-link:hover { color: var(--warm-white); }
-
-.utility-bar__search-panel {
-    background: var(--forest);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: var(--space-md) 0;
-}
-.utility-bar__search-panel .search-form {
-    display: flex;
-    gap: var(--space-sm);
-    max-width: 500px;
-    margin: 0 auto;
-}
-.utility-bar__search-panel input[type="search"] {
-    flex: 1;
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--moss);
-    background: rgba(255,255,255,0.1);
-    color: var(--warm-white);
-    font-size: 15px;
-}
-.utility-bar__search-panel input[type="search"]::placeholder { color: var(--moss); }
-.utility-bar__search-panel button[type="submit"] {
-    padding: 8px 20px;
-    background: var(--sage);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 13px;
-}
 
 /* ============================================================
    9. HEADER — ZONE 2: PRIMARY NAV
