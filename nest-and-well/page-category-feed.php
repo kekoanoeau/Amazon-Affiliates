@@ -32,22 +32,6 @@ $total_pages = (int) $feed_query->max_num_pages;
 
 <main id="main" class="site-main site-main--category-feed">
 
-    <!-- Page header -->
-    <div class="category-feed-hero">
-        <div class="container">
-            <?php nest_well_breadcrumbs(); ?>
-            <h1 class="category-feed-hero__title"><?php the_title(); ?></h1>
-            <?php
-            $description = get_the_content();
-            if ( $description ) :
-            ?>
-            <div class="category-feed-hero__desc">
-                <?php echo wp_kses_post( wpautop( $description ) ); ?>
-            </div>
-            <?php endif; ?>
-        </div>
-    </div><!-- .category-feed-hero -->
-
     <div class="hp-feed container">
 
         <!-- Article grid — initial server-side load -->
