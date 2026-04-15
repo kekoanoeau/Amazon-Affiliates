@@ -62,23 +62,6 @@ defined( 'ABSPATH' ) || exit;
     </div>
     <?php endif; ?>
 
-    <!-- About Widget -->
-    <?php if ( is_active_sidebar( 'sidebar-about' ) ) : ?>
-    <div class="sidebar__section sidebar__section--about">
-        <?php dynamic_sidebar( 'sidebar-about' ); ?>
-    </div>
-    <?php else : ?>
-    <div class="sidebar__section sidebar__section--about">
-        <div class="widget widget--about">
-            <h4 class="widget-title"><?php esc_html_e( 'About Nest & Well', 'nest-and-well' ); ?></h4>
-            <p><?php esc_html_e( 'We test smart home and wellness products in real homes to give you honest, unsponsored reviews you can trust.', 'nest-and-well' ); ?></p>
-            <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="widget-about__link">
-                <?php esc_html_e( 'Learn how we review &rarr;', 'nest-and-well' ); ?>
-            </a>
-        </div>
-    </div>
-    <?php endif; ?>
-
     <!-- Main Sidebar (catch-all) -->
     <?php if ( is_active_sidebar( 'sidebar-1' ) ) : ?>
     <div class="sidebar__section">
