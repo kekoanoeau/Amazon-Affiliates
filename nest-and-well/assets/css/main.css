@@ -1331,7 +1331,7 @@ em, i { font-style: italic; }
 
 .article-head {
     background: var(--white);
-    padding: 0 0 var(--space-xl);
+    padding: var(--space-lg) 0 var(--space-xl);
     border-bottom: 1px solid var(--lt-stone);
     margin-bottom: var(--space-2xl);
 }
@@ -2004,6 +2004,9 @@ em, i { font-style: italic; }
 /* ============================================================
    18. SIDEBAR & WIDGETS
    ============================================================ */
+.sidebar__section { padding-bottom: var(--space-xl); margin-bottom: var(--space-xl); border-bottom: 1px solid var(--lt-stone); }
+.sidebar__section:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
+
 .widget { margin-bottom: var(--space-xl); }
 
 .widget-title {
@@ -2048,6 +2051,16 @@ em, i { font-style: italic; }
     color: var(--amber);
     font-weight: 700;
 }
+
+/* Top picks image grid (deals category) */
+.top-picks-image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xs);
+}
+.top-picks-image-grid__item { display: block; overflow: hidden; border-radius: var(--radius-sm); }
+.top-picks-image-grid__img { width: 100%; height: 72px; object-fit: cover; display: block; transition: transform var(--transition-fast); }
+.top-picks-image-grid__item:hover .top-picks-image-grid__img { transform: scale(1.04); }
 
 /* Sidebar email form */
 .sidebar-email-default { }
@@ -2215,7 +2228,7 @@ em, i { font-style: italic; }
 /* ============================================================
    23. COMMENTS
    ============================================================ */
-.article-comments { margin-top: var(--space-2xl); border-top: 1px solid var(--lt-stone); padding-top: var(--space-2xl); }
+.article-comments { margin-top: var(--space-2xl); margin-bottom: var(--space-3xl); border-top: 1px solid var(--lt-stone); padding-top: var(--space-2xl); }
 
 .comments-title { font-size: 22px; margin-bottom: var(--space-xl); }
 

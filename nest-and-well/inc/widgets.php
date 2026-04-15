@@ -130,28 +130,26 @@ function nest_well_sidebar_has_widgets( $sidebar_id ) {
 }
 
 /**
- * Output the Top Picks widget content (most recent posts from same category).
+ * Output the Top Picks widget content (posts from the Deals category, featured images only).
  *
  * @param int $post_id Current post ID.
  */
 function nest_well_top_picks_default( $post_id ) {
-    $categories = get_the_category( $post_id );
-
-    if ( empty( $categories ) ) {
-        return;
-    }
-
-    $cat_id = $categories[0]->term_id;
+    $deals_cat = get_category_by_slug( 'deals' );
+    $cat_id    = $deals_cat ? $deals_cat->term_id : 0;
 
     $args = array(
         'post_type'           => 'post',
-        'posts_per_page'      => 5,
-        'cat'                 => $cat_id,
+        'posts_per_page'      => 6,
         'post__not_in'        => array( $post_id ),
         'ignore_sticky_posts' => true,
         'orderby'             => 'date',
         'order'               => 'DESC',
     );
+
+    if ( $cat_id ) {
+        $args['cat'] = $cat_id;
+    }
 
     $top_picks = new WP_Query( $args );
 
@@ -159,24 +157,16 @@ function nest_well_top_picks_default( $post_id ) {
         return;
     }
 
-    echo '<div class="top-picks-list">';
+    echo '<div class="top-picks-image-grid">';
 
     while ( $top_picks->have_posts() ) {
         $top_picks->the_post();
-        $score = get_post_meta( get_the_ID(), '_review_score', true );
+        if ( ! has_post_thumbnail() ) {
+            continue;
+        }
         ?>
-        <a href="<?php the_permalink(); ?>" class="top-picks-item">
-            <?php if ( has_post_thumbnail() ) : ?>
-                <div class="top-picks-item__thumb">
-                    <?php the_post_thumbnail( 'thumbnail', array( 'loading' => 'lazy' ) ); ?>
-                </div>
-            <?php endif; ?>
-            <div class="top-picks-item__content">
-                <span class="top-picks-item__title"><?php the_title(); ?></span>
-                <?php if ( $score ) : ?>
-                    <span class="top-picks-item__score"><?php echo esc_html( $score ); ?>/10</span>
-                <?php endif; ?>
-            </div>
+        <a href="<?php the_permalink(); ?>" class="top-picks-image-grid__item" aria-label="<?php the_title_attribute(); ?>">
+            <?php the_post_thumbnail( 'medium', array( 'loading' => 'lazy', 'class' => 'top-picks-image-grid__img' ) ); ?>
         </a>
         <?php
     }
