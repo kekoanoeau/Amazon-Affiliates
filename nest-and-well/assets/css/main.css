@@ -2749,3 +2749,349 @@ em, i { font-style: italic; }
     .article-tabs { gap: 6px; }
     .article-tabs__tab { padding: 7px 14px; font-size: 13px; }
 }
+
+/* ============================================================
+   28. AFFILIATE DISCLOSURE PAGE
+   ============================================================ */
+
+/* Page layout */
+.site-main--disclosure { padding-top: 0; }
+
+/* ——— Hero Banner ——— */
+.disclosure-hero {
+    background-color: var(--forest);
+    color: var(--warm-white);
+    padding: var(--space-3xl) 0;
+}
+
+.disclosure-hero__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+}
+
+.disclosure-hero__icon {
+    flex-shrink: 0;
+    color: var(--moss);
+    opacity: 0.9;
+}
+
+.disclosure-hero__title {
+    font-size: 32px;
+    color: var(--warm-white);
+    margin-bottom: var(--space-sm);
+}
+
+.disclosure-hero__sub {
+    color: var(--moss);
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ——— FTC Quick-Summary ——— */
+.disclosure-summary {
+    background: var(--lt-stone);
+    border-left: 4px solid var(--amber);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-xl) 0;
+}
+
+.disclosure-summary__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: var(--amber);
+    color: var(--forest);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    margin-bottom: var(--space-md);
+}
+
+.disclosure-summary__text {
+    font-size: 15px;
+    color: var(--charcoal);
+    line-height: 1.7;
+    margin-bottom: var(--space-sm);
+}
+
+.disclosure-summary__updated {
+    font-size: 12px;
+    color: var(--slate);
+    margin: 0;
+}
+
+/* ——— Table of Contents ——— */
+.disclosure-toc {
+    background: var(--white);
+    border: 1px solid var(--lt-stone);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+    display: inline-block;
+    min-width: 260px;
+}
+
+.disclosure-toc__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: var(--space-sm);
+}
+
+.disclosure-toc__list {
+    list-style: decimal;
+    padding-left: var(--space-lg);
+    margin: 0;
+}
+
+.disclosure-toc__list li {
+    margin-bottom: var(--space-xs);
+    font-size: 14px;
+}
+
+.disclosure-toc__list a {
+    color: var(--sage);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.disclosure-toc__list a:hover {
+    color: var(--forest);
+    border-bottom-color: var(--forest);
+}
+
+/* ——— Disclosure Body ——— */
+.disclosure-body {
+    max-width: var(--content-width);
+    padding-bottom: var(--space-4xl);
+}
+
+/* ——— Sections ——— */
+.disclosure-section {
+    padding: var(--space-2xl) 0;
+    border-bottom: 1px solid var(--lt-stone);
+}
+
+.disclosure-section--last {
+    border-bottom: none;
+}
+
+.disclosure-section__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.disclosure-section__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--lt-stone);
+    border-radius: 50%;
+    color: var(--forest);
+}
+
+.disclosure-section h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 22px;
+    color: var(--forest);
+}
+
+.disclosure-section p,
+.disclosure-section ul,
+.disclosure-section ol {
+    color: var(--charcoal);
+    font-size: 15px;
+    line-height: 1.75;
+}
+
+.disclosure-section ul {
+    list-style: disc;
+    padding-left: var(--space-xl);
+    margin-bottom: var(--space-md);
+}
+
+.disclosure-section ul li {
+    margin-bottom: var(--space-sm);
+}
+
+/* ——— Highlighted callout ——— */
+.disclosure-highlight {
+    background: var(--lt-stone);
+    border-left: 3px solid var(--sage);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 15px;
+    color: var(--charcoal);
+    margin: var(--space-lg) 0;
+}
+
+/* ——— Amazon Associates Badge ——— */
+.disclosure-amazon-badge {
+    background: var(--white);
+    border: 1px solid var(--mid-stone);
+    border-top: 3px solid var(--amber);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.disclosure-amazon-badge__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.disclosure-amazon-badge__logo {
+    flex-shrink: 0;
+    color: var(--amber);
+}
+
+.disclosure-amazon-badge__title {
+    font-weight: 700;
+    color: var(--forest);
+    font-size: 15px;
+    margin-bottom: var(--space-xs);
+}
+
+.disclosure-amazon-badge__sub {
+    font-size: 13px;
+    color: var(--slate);
+    margin: 0;
+}
+
+/* ——— Commission Table ——— */
+.disclosure-commission-table {
+    margin: var(--space-lg) 0;
+}
+
+.disclosure-commission-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: var(--space-sm);
+}
+
+.disclosure-commission-table th {
+    background: var(--forest);
+    color: var(--white);
+    font-weight: 700;
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+}
+
+.disclosure-commission-table td {
+    padding: 10px var(--space-md);
+    border: 1px solid var(--mid-stone);
+}
+
+.disclosure-commission-table tr:nth-child(odd) td  { background: var(--white); }
+.disclosure-commission-table tr:nth-child(even) td { background: var(--lt-stone); }
+
+.disclosure-commission-table__note {
+    font-size: 12px;
+    color: var(--slate);
+    margin: 0;
+}
+
+/* ——— Editorial Principles ——— */
+.disclosure-principles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+}
+
+.disclosure-principle {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+}
+
+.disclosure-principle__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--forest);
+    color: var(--white);
+    border-radius: 50%;
+    margin-top: 2px;
+}
+
+.disclosure-principle strong {
+    display: block;
+    font-size: 15px;
+    color: var(--forest);
+    margin-bottom: var(--space-xs);
+}
+
+.disclosure-principle p {
+    font-size: 14px;
+    color: var(--slate);
+    margin: 0;
+}
+
+/* ——— Contact Block ——— */
+.disclosure-contact {
+    background: var(--lt-stone);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.disclosure-contact__item {
+    font-size: 15px;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.disclosure-contact__item strong {
+    color: var(--forest);
+    min-width: 70px;
+}
+
+.disclosure-contact__item a {
+    color: var(--sage);
+}
+
+.disclosure-contact__item a:hover {
+    color: var(--forest);
+}
+
+.disclosure-contact__note {
+    font-size: 13px;
+    color: var(--slate);
+    margin-top: var(--space-md);
+}
+
+/* ——— Responsive ——— */
+@media (max-width: 767px) {
+    .disclosure-hero { padding: var(--space-2xl) 0; }
+    .disclosure-hero__inner { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+    .disclosure-hero__title { font-size: 26px; }
+    .disclosure-toc { display: block; min-width: auto; }
+    .disclosure-amazon-badge__inner { flex-direction: column; align-items: flex-start; }
+    .disclosure-contact { padding: var(--space-md); }
+    .disclosure-contact__item { flex-direction: column; gap: var(--space-xs); }
+}
