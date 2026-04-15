@@ -1299,7 +1299,7 @@ em, i { font-style: italic; }
 
 .article-head {
     background: var(--white);
-    padding: var(--space-2xl) 0 var(--space-xl);
+    padding: 0 0 var(--space-xl);
     border-bottom: 1px solid var(--lt-stone);
     margin-bottom: var(--space-2xl);
 }
