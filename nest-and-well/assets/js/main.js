@@ -107,21 +107,53 @@
   // ============================================================
   function initSearchToggle() {
     var searchToggle = $('.utility-bar__search-toggle');
-    var searchPanel = $('#site-search-form');
+    var searchWrap   = $('#site-search-form');
 
-    if (!searchToggle || !searchPanel) return;
+    if (!searchToggle || !searchWrap) return;
+
+    function openSearch() {
+      searchWrap.classList.add('is-open');
+      searchWrap.setAttribute('aria-hidden', 'false');
+      searchToggle.setAttribute('aria-expanded', 'true');
+      searchToggle.setAttribute('aria-label', 'Close search');
+      // Brief delay so the CSS width transition plays before focus moves
+      setTimeout(function () {
+        var input = searchWrap.querySelector('input[type="search"]');
+        if (input) input.focus();
+      }, 50);
+    }
+
+    function closeSearch() {
+      searchWrap.classList.remove('is-open');
+      searchWrap.setAttribute('aria-hidden', 'true');
+      searchToggle.setAttribute('aria-expanded', 'false');
+      searchToggle.setAttribute('aria-label', 'Search');
+    }
 
     searchToggle.addEventListener('click', function () {
-      var isExpanded = searchToggle.getAttribute('aria-expanded') === 'true';
-
-      searchToggle.setAttribute('aria-expanded', String(!isExpanded));
-
-      if (isExpanded) {
-        searchPanel.hidden = true;
+      if (searchToggle.getAttribute('aria-expanded') === 'true') {
+        closeSearch();
       } else {
-        searchPanel.hidden = false;
-        var searchInput = searchPanel.querySelector('input[type="search"]');
-        if (searchInput) searchInput.focus();
+        openSearch();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && searchToggle.getAttribute('aria-expanded') === 'true') {
+        closeSearch();
+        searchToggle.focus();
+      }
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function (e) {
+      if (
+        searchToggle.getAttribute('aria-expanded') === 'true' &&
+        !searchWrap.contains(e.target) &&
+        !searchToggle.contains(e.target)
+      ) {
+        closeSearch();
       }
     });
   }

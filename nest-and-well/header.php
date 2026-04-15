@@ -65,25 +65,45 @@
 
                 <!-- Utility Actions -->
                 <div class="utility-bar__actions">
+
+                    <!-- Inline search — expands left of the icon -->
+                    <div class="utility-bar__search-wrap" id="site-search-form" aria-hidden="true">
+                        <form role="search" method="get" class="utility-bar__search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                            <label class="screen-reader-text" for="utility-search-input">
+                                <?php esc_html_e( 'Search', 'nest-and-well' ); ?>
+                            </label>
+                            <input type="search"
+                                   id="utility-search-input"
+                                   class="utility-bar__search-input"
+                                   name="s"
+                                   placeholder="<?php esc_attr_e( 'Search reviews\u2026', 'nest-and-well' ); ?>"
+                                   value="<?php echo esc_attr( get_search_query() ); ?>"
+                                   autocomplete="off">
+                            <button type="submit" class="utility-bar__search-submit" aria-label="<?php esc_attr_e( 'Submit search', 'nest-and-well' ); ?>">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div><!-- .utility-bar__search-wrap -->
+
                     <button class="utility-bar__search-toggle"
-                            aria-label="<?php esc_attr_e( 'Toggle search', 'nest-and-well' ); ?>"
+                            aria-label="<?php esc_attr_e( 'Search', 'nest-and-well' ); ?>"
                             aria-expanded="false"
                             aria-controls="site-search-form">
-                        <svg class="utility-bar__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <!-- Search icon (visible when closed) -->
+                        <svg class="utility-bar__search-icon utility-bar__search-icon--search" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
+                        <!-- Close icon (visible when open) -->
+                        <svg class="utility-bar__search-icon utility-bar__search-icon--close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 6 6 18M6 6l12 12"></path>
+                        </svg>
                     </button>
-                </div>
 
-            </div><!-- .utility-bar__inner -->
-
-            <!-- Search Form (initially hidden) -->
-            <div class="utility-bar__search-panel" id="site-search-form" hidden>
-                <div class="container">
-                    <?php get_search_form(); ?>
-                </div>
-            </div>
+                </div><!-- .utility-bar__actions -->
         </div><!-- .site-header__utility-bar -->
         <?php endif; ?>
 
