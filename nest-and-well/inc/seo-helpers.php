@@ -263,7 +263,9 @@ function nest_well_article_schema() {
 }
 
 /**
- * Build Review schema for product review posts.
+ * Build Product+Review+AggregateRating schema for product review posts.
+ * Uses Product as the top-level type so Google can surface star ratings
+ * in search results via the aggregateRating rich result.
  *
  * @return array Schema array.
  */
@@ -271,38 +273,56 @@ function nest_well_review_schema() {
     $post_id      = get_the_ID();
     $score        = (float) get_post_meta( $post_id, '_review_score', true );
     $product_name = get_post_meta( $post_id, '_product_name', true );
+    $product_asin = get_post_meta( $post_id, '_product_asin', true );
     $last_updated = get_post_meta( $post_id, '_last_updated', true );
+    $image        = nest_well_get_og_image();
 
     $author_id   = get_post_field( 'post_author', $post_id );
     $author_name = get_the_author_meta( 'display_name', $author_id );
+    $author_url  = get_author_posts_url( $author_id );
 
-    return array(
-        '@context'     => 'https://schema.org',
-        '@type'        => 'Review',
-        'name'         => get_the_title(),
-        'description'  => nest_well_get_seo_description(),
-        'url'          => get_permalink(),
-        'datePublished' => get_the_date( 'c' ),
-        'dateModified'  => $last_updated ? date( 'c', strtotime( $last_updated ) ) : get_the_modified_date( 'c' ),
-        'author'       => array(
-            '@type' => 'Person',
-            'name'  => $author_name,
+    $schema = array(
+        '@context'        => 'https://schema.org',
+        '@type'           => 'Product',
+        'name'            => $product_name,
+        'image'           => $image,
+        'review'          => array(
+            '@type'         => 'Review',
+            'name'          => get_the_title(),
+            'description'   => nest_well_get_seo_description(),
+            'url'           => get_permalink(),
+            'datePublished' => get_the_date( 'c' ),
+            'dateModified'  => $last_updated ? date( 'c', strtotime( $last_updated ) ) : get_the_modified_date( 'c' ),
+            'author'        => array(
+                '@type' => 'Person',
+                'name'  => $author_name,
+                'url'   => $author_url,
+            ),
+            'reviewRating'  => array(
+                '@type'       => 'Rating',
+                'ratingValue' => $score,
+                'bestRating'  => 10,
+                'worstRating' => 0,
+            ),
+            'publisher'     => array(
+                '@type' => 'Organization',
+                'name'  => get_bloginfo( 'name' ),
+            ),
         ),
-        'reviewRating' => array(
-            '@type'       => 'Rating',
+        'aggregateRating' => array(
+            '@type'       => 'AggregateRating',
             'ratingValue' => $score,
+            'reviewCount' => 1,
             'bestRating'  => 10,
             'worstRating' => 0,
         ),
-        'itemReviewed' => array(
-            '@type' => 'Product',
-            'name'  => $product_name,
-        ),
-        'publisher'    => array(
-            '@type' => 'Organization',
-            'name'  => get_bloginfo( 'name' ),
-        ),
     );
+
+    if ( $product_asin ) {
+        $schema['url'] = nest_well_amazon_url( $product_asin );
+    }
+
+    return $schema;
 }
 
 /**
