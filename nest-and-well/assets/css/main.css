@@ -2768,33 +2768,7 @@ em, i { font-style: italic; }
 .sticky-buy-bar__btn { flex-shrink: 0; padding: 10px 20px; font-size: 13px; }
 
 /* ============================================================
-   31. BREADCRUMBS
-   ============================================================ */
-.breadcrumbs { margin-bottom: var(--space-md); }
-.breadcrumbs__list {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    list-style: none;
-}
-.breadcrumbs__item {
-    display: flex;
-    align-items: center;
-    font-size: 13px;
-    color: var(--slate);
-}
-.breadcrumbs__item + .breadcrumbs__item::before {
-    content: '›';
-    margin-right: var(--space-xs);
-    color: var(--mid-stone);
-}
-.breadcrumbs__link { color: var(--sage); text-decoration: none; }
-.breadcrumbs__link:hover { color: var(--forest); text-decoration: underline; }
-.breadcrumbs__item--current { color: var(--slate); }
-
-/* ============================================================
-   32. RESPONSIVE BREAKPOINTS
+   31. RESPONSIVE BREAKPOINTS
    Mobile-first: base = mobile, add features at larger sizes
    Mobile-first: base = mobile, add features at larger sizes
    ============================================================ */
