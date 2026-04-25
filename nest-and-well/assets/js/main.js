@@ -607,6 +607,19 @@
   }
 
   // ============================================================
+  // 9. Table Scroll Wrap
+  // ============================================================
+  function initTableScroll() {
+    $$('.entry-content table').forEach(function (table) {
+      if (table.parentNode.classList.contains('table-scroll-wrap')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'table-scroll-wrap';
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
+  }
+
+  // ============================================================
   // Init All
   // ============================================================
   function init() {
@@ -620,6 +633,7 @@
     initCopyLink();
     initStripeNavDropdowns();
     initActiveNav();
+    initTableScroll();
   }
 
   if (document.readyState === 'loading') {

@@ -240,13 +240,23 @@ em, i { font-style: italic; }
     margin: var(--space-lg) 0;
 }
 
+.table-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-bottom: var(--space-xl);
+}
+.table-scroll-wrap .entry-content table {
+    margin-bottom: 0;
+    width: auto;
+    min-width: 100%;
+}
+
 .entry-content table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: var(--space-xl);
     font-size: 14px;
-    overflow-x: auto;
-    display: block;
 }
 
 .entry-content th {
