@@ -121,7 +121,7 @@ get_header();
             <!-- Featured Image -->
             <?php if ( has_post_thumbnail() ) : ?>
             <div class="article-featured-image">
-                <?php the_post_thumbnail( 'hero-image', array( 'loading' => 'eager', 'class' => 'article-featured-image__img' ) ); ?>
+                <?php the_post_thumbnail( 'hero-image', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'class' => 'article-featured-image__img' ) ); ?>
                 <?php
                 $caption = get_post( get_post_thumbnail_id() )->post_excerpt;
                 if ( $caption ) :
