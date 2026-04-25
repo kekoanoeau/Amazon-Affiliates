@@ -38,27 +38,6 @@ get_header();
     <div class="article-head">
         <div class="container">
 
-            <!-- Breadcrumbs -->
-            <?php if ( $primary_cat ) : ?>
-            <nav class="breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb', 'nest-and-well' ); ?>">
-                <ol class="breadcrumbs__list">
-                    <li class="breadcrumbs__item">
-                        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="breadcrumbs__link">
-                            <?php esc_html_e( 'Home', 'nest-and-well' ); ?>
-                        </a>
-                    </li>
-                    <li class="breadcrumbs__item">
-                        <a href="<?php echo esc_url( get_category_link( $primary_cat->term_id ) ); ?>" class="breadcrumbs__link">
-                            <?php echo esc_html( $primary_cat->name ); ?>
-                        </a>
-                    </li>
-                    <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
-                        <?php echo esc_html( wp_trim_words( get_the_title(), 8, '&hellip;' ) ); ?>
-                    </li>
-                </ol>
-            </nav>
-            <?php endif; ?>
-
             <!-- Article Title -->
             <h1 class="article-head__title"><?php the_title(); ?></h1>
 
