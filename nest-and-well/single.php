@@ -17,10 +17,12 @@ get_header();
         the_post();
 
         $post_id      = get_the_ID();
-        $review_score = get_post_meta( $post_id, '_review_score', true );
-        $review_badge = get_post_meta( $post_id, '_review_badge', true );
-        $product_name = get_post_meta( $post_id, '_product_name', true );
-        $last_updated = get_post_meta( $post_id, '_last_updated', true );
+        $review_score  = get_post_meta( $post_id, '_review_score', true );
+        $review_badge  = get_post_meta( $post_id, '_review_badge', true );
+        $product_name  = get_post_meta( $post_id, '_product_name', true );
+        $product_asin  = get_post_meta( $post_id, '_product_asin', true );
+        $product_price = get_post_meta( $post_id, '_product_price', true );
+        $last_updated  = get_post_meta( $post_id, '_last_updated', true );
         $read_time    = nest_well_get_read_time( $post_id );
 
         $author_id    = get_post_field( 'post_author', $post_id );
@@ -35,6 +37,27 @@ get_header();
     <!-- Article Header (above the fold) -->
     <div class="article-head">
         <div class="container">
+
+            <!-- Breadcrumbs -->
+            <?php if ( $primary_cat ) : ?>
+            <nav class="breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb', 'nest-and-well' ); ?>">
+                <ol class="breadcrumbs__list">
+                    <li class="breadcrumbs__item">
+                        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="breadcrumbs__link">
+                            <?php esc_html_e( 'Home', 'nest-and-well' ); ?>
+                        </a>
+                    </li>
+                    <li class="breadcrumbs__item">
+                        <a href="<?php echo esc_url( get_category_link( $primary_cat->term_id ) ); ?>" class="breadcrumbs__link">
+                            <?php echo esc_html( $primary_cat->name ); ?>
+                        </a>
+                    </li>
+                    <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+                        <?php echo esc_html( wp_trim_words( get_the_title(), 8, '&hellip;' ) ); ?>
+                    </li>
+                </ol>
+            </nav>
+            <?php endif; ?>
 
             <!-- Article Title -->
             <h1 class="article-head__title"><?php the_title(); ?></h1>
@@ -113,6 +136,31 @@ get_header();
         </div><!-- .container -->
     </div><!-- .article-head -->
 
+    <!-- Sticky Buy Bar (review posts with ASIN only) -->
+    <?php if ( $product_asin ) : ?>
+    <div id="sticky-buy-bar"
+         class="sticky-buy-bar"
+         aria-hidden="true"
+         aria-label="<?php esc_attr_e( 'Buy this product', 'nest-and-well' ); ?>">
+        <div class="container">
+            <div class="sticky-buy-bar__inner">
+                <span class="sticky-buy-bar__title">
+                    <?php echo esc_html( $product_name ?: get_the_title() ); ?>
+                </span>
+                <?php if ( $product_price ) : ?>
+                <span class="sticky-buy-bar__price"><?php echo esc_html( $product_price ); ?></span>
+                <?php endif; ?>
+                <a href="<?php echo esc_url( nest_well_amazon_url( $product_asin ) ); ?>"
+                   class="btn sticky-buy-bar__btn btn--sage"
+                   target="_blank"
+                   rel="nofollow noopener sponsored">
+                    <?php esc_html_e( 'Buy on Amazon', 'nest-and-well' ); ?>
+                </a>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Two-Column Layout: Content + Sidebar -->
     <div class="content-sidebar-wrap">
 
@@ -121,7 +169,7 @@ get_header();
             <!-- Featured Image -->
             <?php if ( has_post_thumbnail() ) : ?>
             <div class="article-featured-image">
-                <?php the_post_thumbnail( 'hero-image', array( 'loading' => 'eager', 'class' => 'article-featured-image__img' ) ); ?>
+                <?php the_post_thumbnail( 'hero-image', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'class' => 'article-featured-image__img' ) ); ?>
                 <?php
                 $caption = get_post( get_post_thumbnail_id() )->post_excerpt;
                 if ( $caption ) :
@@ -188,6 +236,13 @@ get_header();
     <?php endwhile; ?>
 
 </main><!-- #main -->
+
+<!-- Back to Top -->
+<button id="back-to-top"
+        class="back-to-top"
+        aria-label="<?php esc_attr_e( 'Back to top', 'nest-and-well' ); ?>">
+    &#8593;
+</button>
 
 <?php
 get_footer();
