@@ -189,5 +189,12 @@ get_header();
 
 </main><!-- #main -->
 
+<!-- Back to Top -->
+<button id="back-to-top"
+        class="back-to-top"
+        aria-label="<?php esc_attr_e( 'Back to top', 'nest-and-well' ); ?>">
+    &#8593;
+</button>
+
 <?php
 get_footer();
