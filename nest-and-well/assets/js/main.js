@@ -607,7 +607,118 @@
   }
 
   // ============================================================
-  // 9. Table Scroll Wrap
+  // 9. Reading Progress Bar
+  // ============================================================
+  function initReadingProgress() {
+    var article = $('.article-body');
+    if (!article) return;
+
+    var bar = document.createElement('div');
+    bar.className = 'reading-progress-bar';
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.prepend(bar);
+
+    function updateProgress() {
+      var rect      = article.getBoundingClientRect();
+      var top       = rect.top + window.scrollY;
+      var scrolled  = window.scrollY - top;
+      var percent   = Math.min(100, Math.max(0, (scrolled / rect.height) * 100));
+      bar.style.width = percent + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  }
+
+  // ============================================================
+  // 10. Back to Top
+  // ============================================================
+  function initBackToTop() {
+    var btn = $('#back-to-top');
+    if (!btn) return;
+
+    function updateVisibility() {
+      btn.classList.toggle('is-visible', window.scrollY > 600);
+    }
+
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    updateVisibility();
+  }
+
+  // ============================================================
+  // 11. Table of Contents
+  // ============================================================
+  function initTableOfContents() {
+    var content = $('.entry-content');
+    if (!content) return;
+
+    var headings = Array.prototype.slice.call(content.querySelectorAll('h2, h3'));
+    if (headings.length < 2) return;
+
+    headings.forEach(function (h, i) {
+      if (!h.id) {
+        h.id = 'toc-' + i + '-' + h.textContent.trim().toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      }
+    });
+
+    var nav = document.createElement('nav');
+    nav.className = 'toc';
+    nav.setAttribute('aria-label', 'Table of contents');
+
+    var title = document.createElement('p');
+    title.className = 'toc__title';
+    title.textContent = 'In This Article';
+    nav.appendChild(title);
+
+    var list = document.createElement('ul');
+    list.className = 'toc__list';
+
+    headings.forEach(function (h) {
+      var li = document.createElement('li');
+      li.className = 'toc__item toc__item--' + h.tagName.toLowerCase();
+      var a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.className = 'toc__link';
+      a.textContent = h.textContent;
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+
+    nav.appendChild(list);
+
+    var firstP = content.querySelector('p');
+    if (firstP && firstP.nextSibling) {
+      content.insertBefore(nav, firstP.nextSibling);
+    } else {
+      content.insertBefore(nav, content.firstChild);
+    }
+  }
+
+  // ============================================================
+  // 12. Sticky Buy Bar
+  // ============================================================
+  function initStickyBuyBar() {
+    var bar     = $('#sticky-buy-bar');
+    var trigger = $('.article-head');
+    if (!bar || !trigger) return;
+
+    function updateBar() {
+      var show = trigger.getBoundingClientRect().bottom < 0;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+
+    window.addEventListener('scroll', updateBar, { passive: true });
+    updateBar();
+  }
+
+  // ============================================================
+  // 13. Table Scroll Wrap
   // ============================================================
   function initTableScroll() {
     $$('.entry-content table').forEach(function (table) {
@@ -634,6 +745,10 @@
     initStripeNavDropdowns();
     initActiveNav();
     initTableScroll();
+    initReadingProgress();
+    initBackToTop();
+    initTableOfContents();
+    initStickyBuyBar();
   }
 
   if (document.readyState === 'loading') {
