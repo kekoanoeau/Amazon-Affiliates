@@ -1,7 +1,10 @@
 <?php
 /**
- * 5-Stripe Category Navigation Bar
- * Expandable stripes — clicking the chevron reveals child category links.
+ * Category Strip — quiet horizontal text nav.
+ *
+ * Replaces the legacy 5-colour stripe bar with a single-row text nav.
+ * Each category retains its accent colour as a 3 px hover/active underline,
+ * keeping wayfinding without dominating the chrome.
  *
  * @package nest-and-well
  * @since 1.0.0
@@ -14,8 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * e.g. "/smart-home/" → "smart-home"
  */
 function nest_well_slug_from_url( $url ) {
-    $path = trim( parse_url( $url, PHP_URL_PATH ), '/' );
-    // Take the last non-empty path segment
+    $path  = trim( wp_parse_url( $url, PHP_URL_PATH ), '/' );
     $parts = array_filter( explode( '/', $path ) );
     return end( $parts ) ?: '';
 }
@@ -36,13 +38,15 @@ function nest_well_get_stripe_children( $slug ) {
         return array();
     }
 
-    $children = get_categories( array(
-        'parent'     => $parent->term_id,
-        'hide_empty' => false,
-        'number'     => 8,
-        'orderby'    => 'count',
-        'order'      => 'DESC',
-    ) );
+    $children = get_categories(
+        array(
+            'parent'     => $parent->term_id,
+            'hide_empty' => false,
+            'number'     => 8,
+            'orderby'    => 'count',
+            'order'      => 'DESC',
+        )
+    );
 
     $items = array();
     foreach ( $children as $child ) {
@@ -54,48 +58,58 @@ function nest_well_get_stripe_children( $slug ) {
     return $items;
 }
 
-// Stripe 1 uses --pine (distinct dark teal) instead of --forest
-// to differentiate it from the header and hero backgrounds.
 $stripes = array(
     1 => array(
-        'label' => get_theme_mod( 'nest_well_stripe_1_label', 'Smart Home' ),
-        'url'   => get_theme_mod( 'nest_well_stripe_1_url', '/smart-home/' ),
-        'color' => 'var(--pine)',   // distinct from --forest header/hero
+        'label'  => get_theme_mod( 'nest_well_stripe_1_label', 'Smart Home' ),
+        'url'    => get_theme_mod( 'nest_well_stripe_1_url', '/smart-home/' ),
+        'accent' => 'var(--pine)',
     ),
     2 => array(
-        'label' => get_theme_mod( 'nest_well_stripe_2_label', 'Wellness Tech' ),
-        'url'   => get_theme_mod( 'nest_well_stripe_2_url', '/wellness-tech/' ),
-        'color' => 'var(--sage)',
+        'label'  => get_theme_mod( 'nest_well_stripe_2_label', 'Wellness Tech' ),
+        'url'    => get_theme_mod( 'nest_well_stripe_2_url', '/wellness-tech/' ),
+        'accent' => 'var(--sage)',
     ),
     3 => array(
-        'label' => get_theme_mod( 'nest_well_stripe_3_label', 'Home Beauty' ),
-        'url'   => get_theme_mod( 'nest_well_stripe_3_url', '/home-beauty/' ),
-        'color' => 'var(--moss)',
+        'label'  => get_theme_mod( 'nest_well_stripe_3_label', 'Home Beauty' ),
+        'url'    => get_theme_mod( 'nest_well_stripe_3_url', '/home-beauty/' ),
+        'accent' => 'var(--moss)',
     ),
     4 => array(
-        'label' => get_theme_mod( 'nest_well_stripe_4_label', 'Gift Guides' ),
-        'url'   => get_theme_mod( 'nest_well_stripe_4_url', '/gift-guides/' ),
-        'color' => 'var(--amber)',
+        'label'  => get_theme_mod( 'nest_well_stripe_4_label', 'Gift Guides' ),
+        'url'    => get_theme_mod( 'nest_well_stripe_4_url', '/gift-guides/' ),
+        'accent' => 'var(--amber)',
     ),
     5 => array(
-        'label' => get_theme_mod( 'nest_well_stripe_5_label', 'Deals' ),
-        'url'   => get_theme_mod( 'nest_well_stripe_5_url', '/deals/' ),
-        'color' => 'var(--clay)',
+        'label'  => get_theme_mod( 'nest_well_stripe_5_label', 'Deals' ),
+        'url'    => get_theme_mod( 'nest_well_stripe_5_url', '/deals/' ),
+        'accent' => 'var(--clay)',
     ),
 );
+
+$current_slug = '';
+if ( is_category() ) {
+    $current_slug = get_queried_object()->slug;
+} elseif ( is_singular( 'post' ) ) {
+    $cats = get_the_category();
+    if ( $cats ) {
+        $current_slug = $cats[0]->slug;
+    }
+}
 ?>
-<nav class="stripe-nav" aria-label="<?php esc_attr_e( 'Category Navigation', 'nest-and-well' ); ?>">
-    <div class="stripe-nav__inner">
-        <?php foreach ( $stripes as $num => $stripe ) : ?>
-        <div class="stripe-nav__item stripe-nav__item--<?php echo esc_attr( $num ); ?>"
-             style="background-color: <?php echo esc_attr( $stripe['color'] ); ?>;">
-
-            <a href="<?php echo esc_url( $stripe['url'] ); ?>"
-               class="stripe-nav__label">
-                <?php echo esc_html( $stripe['label'] ); ?>
-            </a>
-
-        </div><!-- .stripe-nav__item -->
-        <?php endforeach; ?>
-    </div><!-- .stripe-nav__inner -->
+<nav class="category-strip" aria-label="<?php esc_attr_e( 'Categories', 'nest-and-well' ); ?>">
+    <div class="category-strip__inner container">
+        <ul class="category-strip__list">
+            <?php foreach ( $stripes as $num => $stripe ) :
+                $slug      = nest_well_slug_from_url( $stripe['url'] );
+                $is_active = ( $slug && $slug === $current_slug );
+                ?>
+            <li class="category-strip__item<?php echo $is_active ? ' is-active' : ''; ?>"
+                style="--cat-accent: <?php echo esc_attr( $stripe['accent'] ); ?>;">
+                <a href="<?php echo esc_url( $stripe['url'] ); ?>" class="category-strip__link">
+                    <?php echo esc_html( $stripe['label'] ); ?>
+                </a>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
 </nav>

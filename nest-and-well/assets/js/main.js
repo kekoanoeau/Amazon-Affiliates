@@ -42,24 +42,18 @@
     var header = $('#masthead');
     if (!header) return;
 
-    var utilityBar = $('.site-header__utility-bar');
-    var stickyBrand = $('.primary-nav__sticky-brand');
-    var scrollThreshold = 80;
+    var scrollThreshold = 40;
 
     function handleScroll() {
       if (window.scrollY > scrollThreshold) {
         header.classList.add('is-sticky');
-        if (utilityBar) utilityBar.setAttribute('aria-hidden', 'true');
-        if (stickyBrand) stickyBrand.removeAttribute('aria-hidden');
       } else {
         header.classList.remove('is-sticky');
-        if (utilityBar) utilityBar.removeAttribute('aria-hidden');
-        if (stickyBrand) stickyBrand.setAttribute('aria-hidden', 'true');
       }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Run on load
+    handleScroll();
   }
 
   // ============================================================
@@ -106,7 +100,7 @@
   // 3. Search Toggle (utility bar)
   // ============================================================
   function initSearchToggle() {
-    var searchToggle = $('.utility-bar__search-toggle');
+    var searchToggle = $('.site-header__search-toggle');
     var searchWrap   = $('#site-search-form');
 
     if (!searchToggle || !searchWrap) return;
@@ -516,86 +510,11 @@
   }
 
   // ============================================================
-  // 8. Stripe Nav Dropdowns
-  // ============================================================
-  function initStripeNavDropdowns() {
-    var stripeItems = $$('.stripe-nav__item.has-dropdown');
-
-    stripeItems.forEach(function (item) {
-      var toggle = item.querySelector('.stripe-nav__toggle');
-      var dropdown = item.querySelector('.stripe-nav__dropdown');
-
-      if (!toggle || !dropdown) return;
-
-      var navInner = item.closest('.stripe-nav__inner');
-
-      function openDropdown() {
-        dropdown.hidden = false;
-        toggle.setAttribute('aria-expanded', 'true');
-        item.classList.add('is-expanded');
-        if (navInner) navInner.classList.add('has-open-dropdown');
-      }
-
-      function closeDropdown() {
-        dropdown.hidden = true;
-        toggle.setAttribute('aria-expanded', 'false');
-        item.classList.remove('is-expanded');
-        if (navInner) navInner.classList.remove('has-open-dropdown');
-      }
-
-      toggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = toggle.getAttribute('aria-expanded') === 'true';
-        // Close all other open dropdowns first
-        $$('.stripe-nav__item.has-dropdown.is-expanded').forEach(function (other) {
-          if (other !== item) {
-            other.querySelector('.stripe-nav__dropdown').hidden = true;
-            other.querySelector('.stripe-nav__toggle').setAttribute('aria-expanded', 'false');
-            other.classList.remove('is-expanded');
-          }
-        });
-        if (isOpen) {
-          closeDropdown();
-        } else {
-          openDropdown();
-        }
-      });
-
-      // Close on Escape key
-      item.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && item.classList.contains('is-expanded')) {
-          closeDropdown();
-          toggle.focus();
-        }
-      });
-    });
-
-    // Click outside closes all dropdowns
-    document.addEventListener('click', function () {
-      $$('.stripe-nav__item.has-dropdown.is-expanded').forEach(function (item) {
-        item.querySelector('.stripe-nav__dropdown').hidden = true;
-        item.querySelector('.stripe-nav__toggle').setAttribute('aria-expanded', 'false');
-        item.classList.remove('is-expanded');
-      });
-      $$('.stripe-nav__inner.has-open-dropdown').forEach(function (inner) {
-        inner.classList.remove('has-open-dropdown');
-      });
-    });
-
-    // Prevent clicks inside dropdown from closing it
-    $$('.stripe-nav__dropdown').forEach(function (dropdown) {
-      dropdown.addEventListener('click', function (e) {
-        e.stopPropagation();
-      });
-    });
-  }
-
-  // ============================================================
   // 9. Active Navigation State
   // ============================================================
   function initActiveNav() {
     var currentPath = window.location.pathname;
-    var navLinks = $$('.primary-nav__menu a, .stripe-nav__item');
+    var navLinks = $$('.site-header__nav a, .category-strip__link');
 
     navLinks.forEach(function (link) {
       var href = link.getAttribute('href');
@@ -718,6 +637,73 @@
   }
 
   // ============================================================
+  // 12b. Email Subscribe Forms (sidebar / footer)
+  // ============================================================
+  function initSubscribeForms() {
+    var forms = $$('.js-subscribe-form');
+    if (!forms.length || typeof window.nestWellSubscribe === 'undefined') return;
+
+    forms.forEach(function (form) {
+      var feedback = form.querySelector('.sidebar-email-form__feedback');
+      var submit   = form.querySelector('button[type="submit"]');
+      var input    = form.querySelector('input[type="email"]');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!input || !input.value || form.dataset.submitting === 'true') return;
+
+        form.dataset.submitting = 'true';
+        if (submit) submit.disabled = true;
+        if (feedback) {
+          feedback.hidden = true;
+          feedback.classList.remove('is-error', 'is-success');
+        }
+
+        var body = new FormData();
+        body.append('action', window.nestWellSubscribe.action);
+        body.append('nonce', window.nestWellSubscribe.nonce);
+        body.append('email', input.value);
+        body.append('source', form.dataset.source || 'sidebar');
+
+        fetch(window.nestWellSubscribe.ajaxUrl, {
+          method: 'POST',
+          credentials: 'same-origin',
+          body: body
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, json: j }; }); })
+          .then(function (res) {
+            var msg = (res.json && res.json.data && res.json.data.message) || '';
+            if (res.ok && res.json && res.json.success) {
+              if (feedback) {
+                feedback.textContent = msg || 'Thanks!';
+                feedback.classList.add('is-success');
+                feedback.hidden = false;
+              }
+              form.reset();
+            } else {
+              if (feedback) {
+                feedback.textContent = msg || 'Something went wrong. Please try again.';
+                feedback.classList.add('is-error');
+                feedback.hidden = false;
+              }
+            }
+          })
+          .catch(function () {
+            if (feedback) {
+              feedback.textContent = 'Network error. Please try again.';
+              feedback.classList.add('is-error');
+              feedback.hidden = false;
+            }
+          })
+          .finally(function () {
+            form.dataset.submitting = 'false';
+            if (submit) submit.disabled = false;
+          });
+      });
+    });
+  }
+
+  // ============================================================
   // 13. Table Scroll Wrap
   // ============================================================
   function initTableScroll() {
@@ -742,13 +728,13 @@
     initLoadMore();
     initFaqAccordion();
     initCopyLink();
-    initStripeNavDropdowns();
     initActiveNav();
     initTableScroll();
     initReadingProgress();
     initBackToTop();
     initTableOfContents();
     initStickyBuyBar();
+    initSubscribeForms();
   }
 
   if (document.readyState === 'loading') {

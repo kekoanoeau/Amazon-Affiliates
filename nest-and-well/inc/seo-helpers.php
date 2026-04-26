@@ -270,12 +270,13 @@ function nest_well_article_schema() {
  * @return array Schema array.
  */
 function nest_well_review_schema() {
-    $post_id      = get_the_ID();
-    $score        = (float) get_post_meta( $post_id, '_review_score', true );
-    $product_name = get_post_meta( $post_id, '_product_name', true );
-    $product_asin = get_post_meta( $post_id, '_product_asin', true );
-    $last_updated = get_post_meta( $post_id, '_last_updated', true );
-    $image        = nest_well_get_og_image();
+    $post_id       = get_the_ID();
+    $score         = (float) get_post_meta( $post_id, '_review_score', true );
+    $product_name  = get_post_meta( $post_id, '_product_name', true );
+    $product_asin  = get_post_meta( $post_id, '_product_asin', true );
+    $product_price = get_post_meta( $post_id, '_product_price', true );
+    $last_updated  = get_post_meta( $post_id, '_last_updated', true );
+    $image         = nest_well_get_og_image();
 
     $author_id   = get_post_field( 'post_author', $post_id );
     $author_name = get_the_author_meta( 'display_name', $author_id );
@@ -321,6 +322,29 @@ function nest_well_review_schema() {
     if ( $product_asin ) {
         $schema['url'] = nest_well_amazon_url( $product_asin );
     }
+
+    // Offer schema — unlocks price snippets in Google SERPs.
+    $offer_url = $product_asin ? nest_well_amazon_url( $product_asin ) : get_permalink();
+    $offer     = array(
+        '@type'         => 'Offer',
+        'url'           => $offer_url,
+        'availability'  => 'https://schema.org/InStock',
+        'priceCurrency' => apply_filters( 'nest_well_offer_currency', 'USD' ),
+        'seller'        => array(
+            '@type' => 'Organization',
+            'name'  => 'Amazon',
+        ),
+    );
+
+    if ( $product_price ) {
+        $price_numeric = preg_replace( '/[^0-9.]/', '', $product_price );
+        if ( '' !== $price_numeric ) {
+            $offer['price']            = $price_numeric;
+            $offer['priceValidUntil']  = gmdate( 'Y-12-31' );
+        }
+    }
+
+    $schema['offers'] = $offer;
 
     return $schema;
 }

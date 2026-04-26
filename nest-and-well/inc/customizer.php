@@ -254,6 +254,25 @@ function nest_well_customizer_register( $wp_customize ) {
         )
     );
 
+    // Brand tagline (under wordmark on homepage + hero eyebrow)
+    $wp_customize->add_setting(
+        'nest_well_brand_tagline',
+        array(
+            'default'           => 'Shop Smarter. Live Better.',
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport'         => 'postMessage',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_brand_tagline',
+        array(
+            'label'       => esc_html__( 'Brand Tagline', 'nest-and-well' ),
+            'description' => esc_html__( 'Shown under the wordmark on the homepage and as the hero eyebrow.', 'nest-and-well' ),
+            'section'     => 'nest_well_homepage',
+            'type'        => 'text',
+        )
+    );
+
     // Hero headline
     $wp_customize->add_setting(
         'nest_well_hero_headline',
@@ -372,6 +391,53 @@ function nest_well_customizer_register( $wp_customize ) {
             'label'   => esc_html__( 'Show Featured Category Grid', 'nest-and-well' ),
             'section' => 'nest_well_homepage',
             'type'    => 'checkbox',
+        )
+    );
+
+    // =========================================================
+    // SECTION: Email Capture (MailerLite)
+    // =========================================================
+    $wp_customize->add_section(
+        'nest_well_email',
+        array(
+            'title'       => esc_html__( 'Email Capture', 'nest-and-well' ),
+            'description' => esc_html__( 'Connect MailerLite to capture sidebar / footer signups. Without an API key, signups are stored locally as a fallback.', 'nest-and-well' ),
+            'panel'       => 'nest_well_settings',
+            'priority'    => 45,
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_mailerlite_api_key',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_mailerlite_api_key',
+        array(
+            'label'       => esc_html__( 'MailerLite API Key', 'nest-and-well' ),
+            'description' => esc_html__( 'Found under MailerLite → Integrations → Developer API.', 'nest-and-well' ),
+            'section'     => 'nest_well_email',
+            'type'        => 'password',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_mailerlite_group_id',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_mailerlite_group_id',
+        array(
+            'label'       => esc_html__( 'MailerLite Group / List ID', 'nest-and-well' ),
+            'description' => esc_html__( 'Optional. Leave blank to add subscribers to your default list.', 'nest-and-well' ),
+            'section'     => 'nest_well_email',
+            'type'        => 'text',
         )
     );
 

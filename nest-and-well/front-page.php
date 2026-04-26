@@ -26,7 +26,14 @@ $total_pages = (int) $home_query->max_num_pages;
 
 <main id="main" class="site-main site-main--home">
 
+	<?php get_template_part( 'template-parts/hero' ); ?>
+
 	<div class="hp-feed container">
+
+		<header class="hp-feed__header">
+			<h2 class="hp-feed__title"><?php esc_html_e( 'Latest Reviews', 'nest-and-well' ); ?></h2>
+			<p class="hp-feed__subtitle"><?php esc_html_e( 'Fresh from our test bench.', 'nest-and-well' ); ?></p>
+		</header>
 
 		<!-- Article grid — initial load -->
 		<div class="hp-feed__grid" id="hp-feed-grid">
