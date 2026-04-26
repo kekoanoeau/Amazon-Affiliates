@@ -24,6 +24,7 @@ require_once NEST_WELL_DIR . '/inc/category-feed-meta.php';
 require_once NEST_WELL_DIR . '/inc/email-capture.php';
 require_once NEST_WELL_DIR . '/inc/user-accounts.php';
 require_once NEST_WELL_DIR . '/inc/faq-meta.php';
+require_once NEST_WELL_DIR . '/inc/review-meta.php';
 
 /**
  * Enqueue theme scripts and styles.

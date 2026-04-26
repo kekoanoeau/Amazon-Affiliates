@@ -17,6 +17,39 @@
     <footer id="colophon" class="site-footer" role="contentinfo">
 
         <!-- =============================================
+             Newsletter band
+             ============================================= -->
+        <section class="footer-newsletter" aria-labelledby="footer-newsletter-title">
+            <div class="footer-newsletter__inner container">
+                <div class="footer-newsletter__copy">
+                    <p class="footer-newsletter__eyebrow"><?php esc_html_e( 'Stay in the know', 'nest-and-well' ); ?></p>
+                    <h2 id="footer-newsletter-title" class="footer-newsletter__title">
+                        <?php esc_html_e( 'Smart picks. Honest reviews. No spam.', 'nest-and-well' ); ?>
+                    </h2>
+                    <p class="footer-newsletter__subtitle">
+                        <?php esc_html_e( 'Join thousands of readers getting our best home, wellness, and gift recommendations every Sunday.', 'nest-and-well' ); ?>
+                    </p>
+                </div>
+                <form class="footer-newsletter__form js-subscribe-form" data-source="footer" novalidate>
+                    <label class="screen-reader-text" for="footer-newsletter-email">
+                        <?php esc_html_e( 'Email address', 'nest-and-well' ); ?>
+                    </label>
+                    <input type="email"
+                           id="footer-newsletter-email"
+                           name="email"
+                           class="footer-newsletter__input"
+                           placeholder="<?php esc_attr_e( 'you@example.com', 'nest-and-well' ); ?>"
+                           autocomplete="email"
+                           required>
+                    <button type="submit" class="btn btn--sage footer-newsletter__submit">
+                        <?php esc_html_e( 'Subscribe', 'nest-and-well' ); ?>
+                    </button>
+                    <p class="sidebar-email-form__feedback" role="status" aria-live="polite" hidden></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- =============================================
              ZONE 3: Legal Footer Bar
              ============================================= -->
         <div class="footer-legal">
