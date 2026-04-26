@@ -86,6 +86,18 @@ get_header();
 
                     <!-- Social Share -->
                     <div class="share-buttons" aria-label="<?php esc_attr_e( 'Share this article', 'nest-and-well' ); ?>">
+                        <button type="button"
+                                class="share-buttons__item share-buttons__item--native js-native-share"
+                                data-share-url="<?php echo esc_attr( get_permalink() ); ?>"
+                                data-share-title="<?php echo esc_attr( get_the_title() ); ?>"
+                                aria-label="<?php esc_attr_e( 'Share', 'nest-and-well' ); ?>"
+                                hidden>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                            </svg>
+                        </button>
+
                         <a href="https://pinterest.com/pin/create/button/?url=<?php echo rawurlencode( get_permalink() ); ?>&description=<?php echo rawurlencode( get_the_title() ); ?>"
                            class="share-buttons__item share-buttons__item--pinterest"
                            target="_blank"
@@ -205,8 +217,45 @@ get_header();
                 ?>
             </article>
 
+            <!-- The Bottom Line / Verdict (review posts only — uses _review_verdict meta) -->
+            <?php get_template_part( 'template-parts/verdict' ); ?>
+
             <!-- Auto FAQ Accordion (from post meta) -->
             <?php get_template_part( 'template-parts/faq-list' ); ?>
+
+            <!-- Prev / next post navigation -->
+            <?php
+            $prev_post = get_previous_post( true );
+            $next_post = get_next_post( true );
+            if ( $prev_post || $next_post ) :
+            ?>
+            <nav class="post-nav" aria-label="<?php esc_attr_e( 'Continue reading', 'nest-and-well' ); ?>">
+                <?php if ( $prev_post ) : ?>
+                <a href="<?php echo esc_url( get_permalink( $prev_post ) ); ?>"
+                   class="post-nav__link post-nav__link--prev"
+                   rel="prev">
+                    <span class="post-nav__direction">&larr; <?php esc_html_e( 'Previous review', 'nest-and-well' ); ?></span>
+                    <span class="post-nav__title"><?php echo esc_html( get_the_title( $prev_post ) ); ?></span>
+                </a>
+                <?php else : ?>
+                <span></span>
+                <?php endif; ?>
+
+                <?php if ( $next_post ) : ?>
+                <a href="<?php echo esc_url( get_permalink( $next_post ) ); ?>"
+                   class="post-nav__link post-nav__link--next"
+                   rel="next">
+                    <span class="post-nav__direction"><?php esc_html_e( 'Next review', 'nest-and-well' ); ?> &rarr;</span>
+                    <span class="post-nav__title"><?php echo esc_html( get_the_title( $next_post ) ); ?></span>
+                </a>
+                <?php else : ?>
+                <span></span>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+
+            <!-- End-of-article newsletter CTA -->
+            <?php get_template_part( 'template-parts/newsletter-cta' ); ?>
 
             <!-- Author Bio -->
             <?php get_template_part( 'template-parts/author-bio' ); ?>

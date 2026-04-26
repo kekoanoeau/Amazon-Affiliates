@@ -61,10 +61,21 @@ $total_pages = (int) $home_query->max_num_pages;
 		</div>
 		<?php endif; ?>
 
-		<!-- Loading indicator -->
+		<!-- Loading indicator \u2014 skeleton card grid, kept under hp-feed__loading for aria-live continuity -->
 		<div class="hp-feed__loading js-infinite-loading" hidden aria-live="polite" aria-busy="false">
-			<span class="hp-feed__spinner" aria-hidden="true"></span>
-			<?php esc_html_e( 'Good things take a moment\u2026', 'nest-and-well' ); ?>
+			<span class="screen-reader-text"><?php esc_html_e( 'Loading more articles\u2026', 'nest-and-well' ); ?></span>
+			<div class="hp-feed__skeleton" aria-hidden="true">
+				<?php for ( $i = 0; $i < 3; $i++ ) : ?>
+				<div class="skeleton-card">
+					<div class="skeleton-card__img"></div>
+					<div class="skeleton-card__body">
+						<div class="skeleton-card__line"></div>
+						<div class="skeleton-card__line skeleton-card__line--short"></div>
+						<div class="skeleton-card__line skeleton-card__line--cta"></div>
+					</div>
+				</div>
+				<?php endfor; ?>
+			</div>
 		</div>
 
 		<!-- End-of-feed message -->

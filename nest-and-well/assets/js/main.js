@@ -468,45 +468,245 @@
   }
 
   // ============================================================
-  // 7. Copy Link Button
+  // 7. Copy Link Button + "Copied ✓" toast
   // ============================================================
   function initCopyLink() {
     var copyButtons = $$('.share-buttons__item--copy');
 
+    function showToast(btn) {
+      var row = btn.closest('.share-buttons') || btn.parentNode;
+      if (!row) return;
+
+      // Replace any existing toast on the same row.
+      var existing = row.querySelector('.nw-copy-toast');
+      if (existing) existing.remove();
+
+      var toast = document.createElement('span');
+      toast.className = 'nw-copy-toast';
+      toast.setAttribute('role', 'status');
+      toast.textContent = 'Copied ✓';
+      row.appendChild(toast);
+
+      // Animation duration matches nw-toast-in keyframe (1.6s).
+      setTimeout(function () { toast.remove(); }, 1700);
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise(function (resolve, reject) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+        document.body.removeChild(ta);
+      });
+    }
+
     copyButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var url = btn.dataset.copyUrl || window.location.href;
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function () {
-            var original = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(function () {
-              btn.textContent = original;
-            }, 2000);
-          });
-        } else {
-          // Fallback for older browsers
-          var textarea = document.createElement('textarea');
-          textarea.value = url;
-          textarea.style.position = 'fixed';
-          textarea.style.opacity = '0';
-          document.body.appendChild(textarea);
-          textarea.select();
-          try {
-            document.execCommand('copy');
-            var original = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(function () {
-              btn.textContent = original;
-            }, 2000);
-          } catch (e) {
-            // Silent fail
-          }
-          document.body.removeChild(textarea);
-        }
+        copyText(url).then(function () {
+          showToast(btn);
+        }).catch(function () { /* silent */ });
       });
     });
+  }
+
+  // ============================================================
+  // 7b. Scroll-reveal — fade-up on cards/sections via [data-reveal]
+  // ============================================================
+  function initScrollReveal() {
+    if (!('IntersectionObserver' in window)) return;
+
+    // Tag the entry points so authors don't have to remember the attribute.
+    var targets = [
+      '.article-card',
+      '.hp-hero__tile',
+      '.quick-picks__card',
+      '.explore-category__item',
+      '.review-summary--auto',
+      '.verdict',
+      '.newsletter-cta',
+      '.author-bio',
+      '.how-we-review',
+      '.faq-item'
+    ];
+    var els = $$(targets.join(','));
+
+    var groupCounter = new WeakMap();
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+
+    els.forEach(function (el) {
+      if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+
+      // Stagger siblings inside the same parent so a row of cards fades in
+      // left-to-right (~80ms apart, capped at 6 to avoid long delays).
+      var parent = el.parentElement;
+      if (parent) {
+        var n = (groupCounter.get(parent) || 0);
+        groupCounter.set(parent, n + 1);
+        if (n > 0 && n < 7) {
+          el.style.setProperty('--reveal-delay', (n * 80) + 'ms');
+        }
+      }
+      io.observe(el);
+    });
+  }
+
+  // ============================================================
+  // 7c. Animated score counters — count up from 0 when in view
+  // ============================================================
+  function initScoreCounters() {
+    if (!('IntersectionObserver' in window)) return;
+
+    // Six score surfaces all expose data-score-target; some wrap the digits
+    // in a child .nw-score-num so we don't trample sibling labels like "/10".
+    var els = $$('[data-score-target]');
+    if (!els.length) return;
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function format(n) {
+      // 1 decimal unless the target is integer (e.g. "10").
+      return Number.isInteger(n) ? String(n) : n.toFixed(1);
+    }
+
+    function getDigitNode(el) {
+      return el.querySelector('.nw-score-num') || el;
+    }
+
+    function runCounter(el) {
+      var target = parseFloat(el.getAttribute('data-score-target'));
+      if (isNaN(target)) return;
+
+      var node = getDigitNode(el);
+
+      // Animate the optional verdict ring alongside the number.
+      var ringHost = el.classList.contains('verdict__score-ring') ? el : null;
+      var ringFill = ringHost ? ringHost.querySelector('.verdict__ring-fill') : null;
+      var ringPct  = ringHost ? parseFloat(ringHost.getAttribute('data-score-pct') || '0') : 0;
+
+      if (reduceMotion) {
+        node.textContent = format(target);
+        if (ringFill) ringFill.style.strokeDashoffset = String(100 - ringPct);
+        return;
+      }
+
+      var duration = 750;
+      var start = null;
+      function step(ts) {
+        if (start === null) start = ts;
+        var t = Math.min(1, (ts - start) / duration);
+        var eased = easeOut(t);
+        var current = target * eased;
+        node.textContent = format(current);
+        if (ringFill) {
+          // pathLength=100 ⇒ stroke-dashoffset 100 = empty, 0 = full.
+          ringFill.style.strokeDashoffset = String(100 - (ringPct * eased));
+        }
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        runCounter(entry.target);
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -20% 0px', threshold: 0.2 });
+
+    els.forEach(function (el) {
+      // Reset to 0.0 so the count-up reads as a real animation; if an
+      // observer never fires (e.g. element is hidden), the original value
+      // is preserved by data-score-target.
+      var node = getDigitNode(el);
+      if (!reduceMotion && node) {
+        var t = parseFloat(el.getAttribute('data-score-target'));
+        node.textContent = Number.isInteger(t) ? '0' : '0.0';
+      }
+      io.observe(el);
+    });
+  }
+
+  // ============================================================
+  // 7e. Comparison table — highlight the row with the highest score
+  // ============================================================
+  // Authors can also opt out by adding data-no-winner to a single
+  // .comparison-table-wrap.
+  function initComparisonWinners() {
+    $$('.comparison-table').forEach(function (table) {
+      if (table.closest('[data-no-winner]')) return;
+
+      var rows = table.querySelectorAll('tbody tr');
+      if (rows.length < 2) return;
+
+      var bestScore = -Infinity;
+      var bestRow   = null;
+
+      rows.forEach(function (row) {
+        var pill = row.querySelector('.comparison-table__score .score-pill');
+        if (!pill) return;
+        // Strip "/10" / non-numeric chars; the value can be "9.4/10" or "9.4".
+        var num = parseFloat(pill.textContent.replace(/[^\d.]/g, ''));
+        if (isNaN(num)) return;
+        if (num > bestScore) {
+          bestScore = num;
+          bestRow   = row;
+        }
+      });
+
+      if (bestRow) {
+        bestRow.classList.add('is-winner');
+        var nameCell = bestRow.querySelector('.comparison-table__name');
+        if (nameCell && !nameCell.querySelector('.comparison-table__win-mark')) {
+          var mark = document.createElement('span');
+          mark.className = 'comparison-table__win-mark';
+          mark.setAttribute('aria-label', 'Highest score');
+          mark.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          nameCell.insertBefore(mark, nameCell.firstChild);
+        }
+      }
+    });
+  }
+
+  // ============================================================
+  // 7d. Star-rating left-to-right fill on viewport entry
+  // ============================================================
+  function initStarFillReveal() {
+    if (!('IntersectionObserver' in window)) return;
+    var groups = $$('.star-rating');
+    if (!groups.length) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.4 });
+
+    groups.forEach(function (g) { io.observe(g); });
   }
 
   // ============================================================
@@ -758,6 +958,118 @@
   }
 
   // ============================================================
+  // 12e. Native Web Share API
+  // ============================================================
+  // Reveals the native-share button when navigator.share is available;
+  // otherwise the button stays hidden and the inline share row is the only
+  // affordance. Activates the native sheet on click.
+  function initNativeShare() {
+    if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
+      return;
+    }
+
+    $$('.js-native-share').forEach(function (btn) {
+      btn.hidden = false;
+      btn.addEventListener('click', function () {
+        var url   = btn.getAttribute('data-share-url') || window.location.href;
+        var title = btn.getAttribute('data-share-title') || document.title;
+
+        navigator.share({ title: title, url: url }).catch(function (err) {
+          // AbortError is fired when the user dismisses the sheet — ignore.
+          if (err && err.name !== 'AbortError') {
+            console.warn('Share failed:', err);
+          }
+        });
+      });
+    });
+  }
+
+  // ============================================================
+  // 12d. Pinterest "Save" overlay on article images
+  // ============================================================
+  // Heavily Pinterest-driven niches (home, wellness, beauty, gifts) get a
+  // hover/tap "Save" button that pins the image with the article URL +
+  // title so readers don't have to install the Pinterest extension.
+  function initPinterestOverlay() {
+    if (!document.body.classList.contains('single-article') &&
+        !document.body.classList.contains('page-template-page-best-of')) {
+      return;
+    }
+
+    var pageUrl   = window.location.href;
+    var pageTitle = document.title || '';
+
+    function pinUrl(imgSrc) {
+      return 'https://pinterest.com/pin/create/button/?' +
+             'url=' + encodeURIComponent(pageUrl) +
+             '&media=' + encodeURIComponent(imgSrc) +
+             '&description=' + encodeURIComponent(pageTitle);
+    }
+
+    function imageSrc(img) {
+      // Prefer the largest src in srcset if present; otherwise fall back to src.
+      var srcset = img.getAttribute('srcset');
+      if (srcset) {
+        var biggest = srcset.split(',').map(function (s) {
+          var parts = s.trim().split(/\s+/);
+          return { url: parts[0], w: parseInt(parts[1] || '0', 10) };
+        }).sort(function (a, b) { return b.w - a.w; })[0];
+        if (biggest && biggest.url) return biggest.url;
+      }
+      return img.currentSrc || img.src;
+    }
+
+    function attach(img) {
+      if (img.dataset.nwPinAttached === '1') return;
+      if (img.naturalWidth && img.naturalWidth < 200) return;
+      if (img.closest('.no-pin, a, .save-article-btn, .share-buttons')) return;
+
+      var src = imageSrc(img);
+      if (!src) return;
+
+      var wrap = img.parentElement;
+      if (!wrap) return;
+
+      // Wrap the image so the absolutely-positioned button has a positioning
+      // context, but only if the parent isn't already a positioned wrapper.
+      var positioned = window.getComputedStyle(wrap).position;
+      if (positioned === 'static') {
+        wrap.style.position = 'relative';
+      }
+      wrap.classList.add('nw-pin-host');
+
+      var btn = document.createElement('a');
+      btn.className = 'nw-pin-btn';
+      btn.href = pinUrl(src);
+      btn.target = '_blank';
+      btn.rel = 'nofollow noopener';
+      btn.setAttribute('aria-label', 'Save this image to Pinterest');
+      btn.innerHTML =
+        '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">' +
+        '<path d="M12 2C6.48 2 2 6.48 2 12c0 4.09 2.46 7.6 6 9.13-.08-.78-.16-1.97.03-2.82.18-.74 1.13-4.74 1.13-4.74s-.29-.58-.29-1.43c0-1.34.78-2.34 1.74-2.34.82 0 1.22.62 1.22 1.36 0 .83-.53 2.07-.8 3.22-.23.96.48 1.74 1.43 1.74 1.71 0 3.03-1.81 3.03-4.41 0-2.31-1.66-3.92-4.03-3.92-2.74 0-4.35 2.06-4.35 4.18 0 .83.32 1.71.72 2.19.08.1.09.18.07.27-.07.3-.24.96-.27 1.1-.04.18-.14.22-.32.13-1.2-.56-1.95-2.31-1.95-3.72 0-3.03 2.2-5.81 6.34-5.81 3.33 0 5.92 2.37 5.92 5.54 0 3.31-2.09 5.97-4.99 5.97-.97 0-1.89-.51-2.2-1.1l-.6 2.28c-.22.84-.81 1.9-1.21 2.54.91.28 1.87.43 2.88.43 5.52 0 10-4.48 10-10S17.52 2 12 2z"/>' +
+        '</svg>' +
+        '<span>Save</span>';
+      wrap.appendChild(btn);
+      img.dataset.nwPinAttached = '1';
+    }
+
+    // Featured image
+    var featured = $('.article-featured-image__img');
+    if (featured) attach(featured);
+
+    // In-content images (after the [content] runs through the_content filter,
+    // images may be inside <figure> or wrapped in links — attach() skips
+    // already-linked images so we don't break gallery-style markup).
+    $$('.entry-content img').forEach(function (img) {
+      if (img.complete) {
+        attach(img);
+      } else {
+        img.addEventListener('load', function () { attach(img); }, { once: true });
+      }
+    });
+  }
+
+  // ============================================================
   // 12c. Theme Toggle (light / dark)
   // ============================================================
   function initThemeToggle() {
@@ -828,6 +1140,12 @@
     initStickyBuyBar();
     initSubscribeForms();
     initThemeToggle();
+    initPinterestOverlay();
+    initNativeShare();
+    initScrollReveal();
+    initScoreCounters();
+    initStarFillReveal();
+    initComparisonWinners();
   }
 
   if (document.readyState === 'loading') {

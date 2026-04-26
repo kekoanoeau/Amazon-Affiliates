@@ -62,13 +62,23 @@
               if (isSaved) {
                 b.classList.add('is-saved');
                 b.setAttribute('aria-label', cfg.i18n && cfg.i18n.unsave ? cfg.i18n.unsave : 'Remove from saved');
+                b.setAttribute('aria-pressed', 'true');
                 var label = b.querySelector('.save-btn__label');
                 if (label) label.textContent = cfg.i18n && cfg.i18n.saved ? cfg.i18n.saved : 'Saved';
               } else {
                 b.classList.remove('is-saved');
                 b.setAttribute('aria-label', cfg.i18n && cfg.i18n.save ? cfg.i18n.save : 'Save article');
+                b.setAttribute('aria-pressed', 'false');
                 var label = b.querySelector('.save-btn__label');
                 if (label) label.textContent = cfg.i18n && cfg.i18n.save ? cfg.i18n.save : 'Save';
+              }
+              // One-shot heartbeat pulse on the actual button the user clicked.
+              if (b === btn) {
+                b.classList.remove('is-pulsing');
+                // Force a reflow so a re-toggle restarts the animation.
+                void b.offsetWidth;
+                b.classList.add('is-pulsing');
+                setTimeout(function () { b.classList.remove('is-pulsing'); }, 500);
               }
             });
 

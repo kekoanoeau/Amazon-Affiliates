@@ -65,7 +65,7 @@ $accent = isset( $accents[ $primary->slug ] ) ? $accents[ $primary->slug ] : 'va
             <a href="<?php echo esc_url( get_permalink( $sibling ) ); ?>" class="explore-category__link">
                 <span class="explore-category__post-title"><?php echo esc_html( get_the_title( $sibling ) ); ?></span>
                 <?php if ( $score ) : ?>
-                <span class="explore-category__score"><?php echo esc_html( number_format( $score, 1 ) ); ?>/10</span>
+                <span class="explore-category__score nw-num"><?php echo esc_html( number_format( $score, 1 ) ); ?>/10</span>
                 <?php endif; ?>
             </a>
         </li>

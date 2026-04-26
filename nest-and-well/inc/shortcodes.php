@@ -91,10 +91,10 @@ function nest_well_product_box_shortcode( $atts ) {
 
                 <?php if ( $atts['rating'] ) : ?>
                 <div class="product-box__score-row">
-                    <span class="product-box__score-badge" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                    <span class="product-box__score-badge nw-num" data-score-target="<?php echo esc_attr( $atts['rating'] ); ?>" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
                         <meta itemprop="ratingValue" content="<?php echo esc_attr( $atts['rating'] ); ?>">
                         <meta itemprop="bestRating" content="10">
-                        <?php echo esc_html( $atts['rating'] ); ?>/10
+                        <span class="nw-score-num"><?php echo esc_html( $atts['rating'] ); ?></span>/10
                     </span>
                     <?php echo wp_kses_post( nest_well_star_rating_html( $atts['rating'] ) ); ?>
                     <?php if ( $atts['review_count'] ) : ?>
@@ -194,7 +194,7 @@ function nest_well_rating_shortcode( $atts ) {
     ob_start();
     ?>
     <span class="rating-badge">
-        <span class="rating-badge__score"><?php echo esc_html( number_format( $score, 1 ) ); ?>/10</span>
+        <span class="rating-badge__score nw-num" data-score-target="<?php echo esc_attr( number_format( $score, 1, '.', '' ) ); ?>"><span class="nw-score-num"><?php echo esc_html( number_format( $score, 1 ) ); ?></span>/10</span>
         <?php if ( $atts['label'] ) : ?>
         <span class="rating-badge__label"><?php echo esc_html( $atts['label'] ); ?></span>
         <?php endif; ?>
@@ -736,3 +736,98 @@ function nest_well_review_summary_shortcode( $atts ) {
     return ob_get_clean();
 }
 add_shortcode( 'review_summary', 'nest_well_review_summary_shortcode' );
+
+// ============================================================
+// 11. [as_tested] — "Tested for X days · Y rooms · Z households" data block
+// ============================================================
+
+/**
+ * "As tested" spec widget — high tech-credibility signal that mirrors the
+ * "test conditions" callouts on Wirecutter / The Verge reviews.
+ *
+ * Authors can pass any combination of the named slots; each becomes a
+ * single tile in a horizontal data strip. Empty slots are dropped.
+ *
+ * Usage:
+ *   [as_tested days="14" rooms="3" households="2" devices="6"]
+ *   [as_tested days="30" weight="9.4 lb" power="150W" noise="32 dB"]
+ *
+ * Reserved (auto-labelled) keys:
+ *   days, weeks, months  — duration
+ *   rooms, households, people, devices  — environment
+ *   weight, height, depth, power, noise, runtime — measurements
+ *
+ * Pass any other key=value and the key becomes the spec label
+ * (capitalised, hyphens → spaces).
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string Spec strip HTML.
+ */
+function nest_well_as_tested_shortcode( $atts ) {
+    $known_labels = array(
+        'days'       => 'Days tested',
+        'weeks'      => 'Weeks tested',
+        'months'     => 'Months tested',
+        'rooms'      => 'Rooms',
+        'households' => 'Households',
+        'people'     => 'People',
+        'devices'    => 'Devices',
+        'weight'     => 'Weight',
+        'height'     => 'Height',
+        'depth'      => 'Depth',
+        'power'      => 'Power',
+        'noise'      => 'Noise',
+        'runtime'    => 'Runtime',
+        'price'      => 'Price tested at',
+    );
+
+    // Pull title separately so it doesn't render as a stat tile.
+    $title  = isset( $atts['title'] ) ? sanitize_text_field( $atts['title'] ) : __( 'How we tested', 'nest-and-well' );
+    if ( isset( $atts['title'] ) ) {
+        unset( $atts['title'] );
+    }
+
+    $atts = is_array( $atts ) ? $atts : array();
+    $stats = array();
+
+    foreach ( $atts as $key => $value ) {
+        $value = trim( (string) $value );
+        if ( '' === $value ) {
+            continue;
+        }
+        $label = isset( $known_labels[ $key ] )
+            ? $known_labels[ $key ]
+            : ucwords( str_replace( array( '-', '_' ), ' ', $key ) );
+
+        $stats[] = array( 'label' => $label, 'value' => $value );
+    }
+
+    if ( empty( $stats ) ) {
+        return '';
+    }
+
+    ob_start();
+    ?>
+    <aside class="as-tested" aria-labelledby="as-tested-title">
+        <div class="as-tested__header">
+            <span class="as-tested__icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+            </span>
+            <p id="as-tested-title" class="as-tested__title"><?php echo esc_html( $title ); ?></p>
+        </div>
+        <dl class="as-tested__grid">
+            <?php foreach ( $stats as $stat ) : ?>
+            <div class="as-tested__cell">
+                <dt class="as-tested__label"><?php echo esc_html( $stat['label'] ); ?></dt>
+                <dd class="as-tested__value nw-num"><?php echo esc_html( $stat['value'] ); ?></dd>
+            </div>
+            <?php endforeach; ?>
+        </dl>
+    </aside>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'as_tested', 'nest_well_as_tested_shortcode' );

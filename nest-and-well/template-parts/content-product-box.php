@@ -95,8 +95,8 @@ if ( is_string( $args['cons'] ) ) {
             <div class="product-box__score-row" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
                 <meta itemprop="ratingValue" content="<?php echo esc_attr( $args['rating'] ); ?>">
                 <meta itemprop="bestRating" content="10">
-                <span class="product-box__score-badge">
-                    <?php echo esc_html( $args['rating'] ); ?>/10
+                <span class="product-box__score-badge nw-num" data-score-target="<?php echo esc_attr( number_format( (float) $args['rating'], 1, '.', '' ) ); ?>">
+                    <span class="nw-score-num"><?php echo esc_html( $args['rating'] ); ?></span>/10
                 </span>
                 <?php echo wp_kses_post( nest_well_star_rating_html( $args['rating'] ) ); ?>
                 <?php if ( $args['review_count'] ) : ?>

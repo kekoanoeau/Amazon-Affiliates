@@ -116,6 +116,8 @@ while ( have_posts() ) :
 
                 <?php get_template_part( 'template-parts/faq-list' ); ?>
 
+                <?php get_template_part( 'template-parts/newsletter-cta' ); ?>
+
                 <?php get_template_part( 'template-parts/author-bio' ); ?>
 
                 <?php get_template_part( 'template-parts/related-posts' ); ?>
