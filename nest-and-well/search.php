@@ -7,6 +7,23 @@
  */
 
 get_header();
+
+$query        = get_search_query();
+$active_cat   = isset( $_GET['cat'] ) ? (int) $_GET['cat'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$has_results  = have_posts();
+global $wp_query;
+$found_count  = isset( $wp_query->found_posts ) ? (int) $wp_query->found_posts : 0;
+
+// Categories used for the filter chips — same five Customizer-driven slugs
+// as the category strip, in the same accent palette.
+$chip_slugs = array( 'smart-home', 'wellness-tech', 'home-beauty', 'gift-guides', 'deals' );
+$accents    = array(
+    'smart-home'    => 'var(--pine)',
+    'wellness-tech' => 'var(--sage)',
+    'home-beauty'   => 'var(--moss)',
+    'gift-guides'   => 'var(--amber)',
+    'deals'         => 'var(--clay)',
+);
 ?>
 
 <main id="main" class="site-main site-main--search">
@@ -18,30 +35,58 @@ get_header();
                 printf(
                     /* translators: %s: search query */
                     esc_html__( 'Search Results for: %s', 'nest-and-well' ),
-                    '<span class="search-header__query">' . esc_html( get_search_query() ) . '</span>'
+                    '<span class="search-header__query">' . esc_html( $query ) . '</span>'
                 );
                 ?>
             </h1>
-            <?php if ( have_posts() ) : ?>
+            <?php if ( $has_results ) : ?>
             <p class="search-header__count">
                 <?php
-                global $wp_query;
                 printf(
                     /* translators: %d: results count */
-                    esc_html( _n( '%d result found', '%d results found', (int) $wp_query->found_posts, 'nest-and-well' ) ),
-                    (int) $wp_query->found_posts
+                    esc_html( _n( '%d result found', '%d results found', $found_count, 'nest-and-well' ) ),
+                    $found_count
                 );
                 ?>
             </p>
             <?php endif; ?>
         </header>
 
-        <!-- New Search Form -->
+        <!-- Search form -->
         <div class="search-form-wrap">
             <?php get_search_form(); ?>
         </div>
 
-        <?php if ( have_posts() ) : ?>
+        <!-- Category filter chips -->
+        <?php if ( $query ) : ?>
+        <div class="search-filters" role="group" aria-label="<?php esc_attr_e( 'Filter by category', 'nest-and-well' ); ?>">
+            <a href="<?php echo esc_url( add_query_arg( array( 's' => $query ), home_url( '/' ) ) ); ?>"
+               class="search-filter-chip<?php echo $active_cat ? '' : ' is-active'; ?>"
+               style="--cat-accent: var(--sage);">
+                <?php esc_html_e( 'All', 'nest-and-well' ); ?>
+            </a>
+            <?php
+            foreach ( $chip_slugs as $slug ) :
+                $term = get_term_by( 'slug', $slug, 'category' );
+                if ( ! $term || is_wp_error( $term ) ) {
+                    continue;
+                }
+                $url = add_query_arg(
+                    array( 's' => $query, 'cat' => $term->term_id ),
+                    home_url( '/' )
+                );
+                $is_active = ( $active_cat === (int) $term->term_id );
+                ?>
+            <a href="<?php echo esc_url( $url ); ?>"
+               class="search-filter-chip<?php echo $is_active ? ' is-active' : ''; ?>"
+               style="--cat-accent: <?php echo esc_attr( $accents[ $slug ] ); ?>;">
+                <?php echo esc_html( $term->name ); ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ( $has_results ) : ?>
         <div class="article-grid article-grid--3col">
             <?php
             while ( have_posts() ) :
@@ -49,7 +94,7 @@ get_header();
                 get_template_part( 'template-parts/content-article' );
             endwhile;
             ?>
-        </div><!-- .article-grid -->
+        </div>
 
         <div class="search-pagination">
             <?php
@@ -64,29 +109,73 @@ get_header();
 
         <?php else : ?>
         <div class="no-results">
-            <p><?php esc_html_e( 'No articles matched your search. Try a different term or browse our categories below.', 'nest-and-well' ); ?></p>
+            <p class="no-results__lede">
+                <?php
+                if ( $active_cat ) {
+                    esc_html_e( "Nothing in that category matched your search. Try removing the filter or searching for another term.", 'nest-and-well' );
+                } else {
+                    esc_html_e( "No articles matched your search. Try one of these popular topics, or browse a category.", 'nest-and-well' );
+                }
+                ?>
+            </p>
+
+            <!-- Popular searches: most-used tags as suggested queries -->
+            <?php
+            $popular_tags = get_tags(
+                array(
+                    'orderby'    => 'count',
+                    'order'      => 'DESC',
+                    'number'     => 8,
+                    'hide_empty' => true,
+                )
+            );
+            if ( ! empty( $popular_tags ) && ! is_wp_error( $popular_tags ) ) :
+            ?>
+            <div class="no-results__popular">
+                <h2 class="no-results__heading"><?php esc_html_e( 'Popular searches', 'nest-and-well' ); ?></h2>
+                <div class="no-results__chips">
+                    <?php foreach ( $popular_tags as $tag ) :
+                        $tag_search_url = add_query_arg( array( 's' => $tag->name ), home_url( '/' ) );
+                        ?>
+                    <a href="<?php echo esc_url( $tag_search_url ); ?>" class="search-filter-chip">
+                        <?php echo esc_html( $tag->name ); ?>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="no-results__categories">
-                <h2><?php esc_html_e( 'Browse Categories', 'nest-and-well' ); ?></h2>
-                <ul>
-                    <?php
-                    wp_list_categories(
-                        array(
-                            'title_li' => '',
-                            'depth'    => 1,
-                            'orderby'  => 'count',
-                            'order'    => 'DESC',
-                            'number'   => 8,
-                        )
-                    );
-                    ?>
+                <h2 class="no-results__heading"><?php esc_html_e( 'Browse by category', 'nest-and-well' ); ?></h2>
+                <ul class="no-results__category-list">
+                    <?php foreach ( $chip_slugs as $slug ) :
+                        $term = get_term_by( 'slug', $slug, 'category' );
+                        if ( ! $term || is_wp_error( $term ) ) {
+                            continue;
+                        }
+                        ?>
+                    <li style="--cat-accent: <?php echo esc_attr( $accents[ $slug ] ); ?>;">
+                        <a href="<?php echo esc_url( get_term_link( $term ) ); ?>">
+                            <?php echo esc_html( $term->name ); ?>
+                            <span class="no-results__count">
+                                <?php
+                                printf(
+                                    /* translators: %d: post count in category */
+                                    esc_html( _n( '%d article', '%d articles', $term->count, 'nest-and-well' ) ),
+                                    (int) $term->count
+                                );
+                                ?>
+                            </span>
+                        </a>
+                    </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
         </div>
         <?php endif; ?>
 
-    </div><!-- .container -->
-</main><!-- #main -->
+    </div>
+</main>
 
 <?php
 get_footer();

@@ -758,6 +758,44 @@
   }
 
   // ============================================================
+  // 12c. Theme Toggle (light / dark)
+  // ============================================================
+  function initThemeToggle() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    var STORAGE_KEY = 'nest-well-theme';
+
+    function currentTheme() {
+      var attr = document.documentElement.getAttribute('data-theme');
+      if (attr === 'dark' || attr === 'light') return attr;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function syncButton() {
+      var isDark = currentTheme() === 'dark';
+      btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+
+    btn.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
+      syncButton();
+    });
+
+    // Re-sync if the system preference changes and no explicit choice is set.
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        if (!localStorage.getItem(STORAGE_KEY)) syncButton();
+      });
+    }
+
+    syncButton();
+  }
+
+  // ============================================================
   // 13. Table Scroll Wrap
   // ============================================================
   function initTableScroll() {
@@ -789,6 +827,7 @@
     initTableOfContents();
     initStickyBuyBar();
     initSubscribeForms();
+    initThemeToggle();
   }
 
   if (document.readyState === 'loading') {

@@ -36,7 +36,7 @@
    1. CSS CUSTOM PROPERTIES
    ============================================================ */
 :root {
-    /* Brand Colors */
+    /* Brand Colors (light theme — also see [data-theme="dark"] below) */
     --forest:     #1A3C34;
     --pine:       #2E6B50;   /* stripe-1 accent — distinct from --forest header/hero */
     --sage:       #4A7C59;
@@ -50,6 +50,54 @@
     --mid-stone:  #C9C1B4;
     --white:      #FFFFFF;
 
+    color-scheme: light;
+}
+
+/* ============================================================
+   DARK THEME — same variable names, dark-tuned values.
+   Picked up automatically by every selector that uses the
+   tokens above. Activate via [data-theme="dark"] on <html>
+   (toggle in header) or via prefers-color-scheme when no
+   explicit choice has been made.
+   ============================================================ */
+[data-theme="dark"] {
+    --forest:     #B8D6CC;   /* now a light forest for headings/wordmark */
+    --pine:       #6FA88C;
+    --sage:       #8FBE9C;
+    --moss:       #98C9A0;
+    --amber:      #F0B65A;
+    --clay:       #D88468;
+    --charcoal:   #E8E4DD;
+    --slate:      #A6B3BA;
+    --warm-white: #14201E;   /* page background */
+    --lt-stone:   #1B2926;   /* elevated surface 1 (cards) */
+    --mid-stone:  #2E3D38;   /* subtle divider */
+    --white:      #1B2926;   /* anything that was pure white becomes elevated dark */
+
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --forest:     #B8D6CC;
+        --pine:       #6FA88C;
+        --sage:       #8FBE9C;
+        --moss:       #98C9A0;
+        --amber:      #F0B65A;
+        --clay:       #D88468;
+        --charcoal:   #E8E4DD;
+        --slate:      #A6B3BA;
+        --warm-white: #14201E;
+        --lt-stone:   #1B2926;
+        --mid-stone:  #2E3D38;
+        --white:      #1B2926;
+
+        color-scheme: dark;
+    }
+}
+
+/* Theme-invariant tokens — typography, layout, spacing, motion. */
+:root {
     /* Typography */
     --font-heading: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
@@ -804,7 +852,8 @@ select:focus-visible {
 .site-header__search-submit:hover { background: var(--forest); }
 
 .site-header__search-toggle,
-.site-header__account-link {
+.site-header__account-link,
+.site-header__theme-toggle {
     background: none;
     border: none;
     color: var(--forest);
@@ -816,7 +865,45 @@ select:focus-visible {
     transition: color var(--transition-fast);
 }
 .site-header__search-toggle:hover,
-.site-header__account-link:hover { color: var(--sage); }
+.site-header__account-link:hover,
+.site-header__theme-toggle:hover { color: var(--sage); }
+
+/* Theme toggle — show sun in dark mode (means "go light"), moon in light mode. */
+.theme-icon { display: none; }
+.theme-icon--moon { display: block; }
+[data-theme="dark"] .theme-icon--moon { display: none; }
+[data-theme="dark"] .theme-icon--sun { display: block; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-icon--moon { display: none; }
+    :root:not([data-theme="light"]) .theme-icon--sun { display: block; }
+}
+
+/* Dark-mode polish: a handful of selectors hardcode forest-rgba for borders
+   or shadows that disappear against the dark page; lift them to a light
+   alpha so they stay visible. */
+[data-theme="dark"] .site-header,
+:root:not([data-theme="light"]) .site-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .site-header.is-sticky,
+:root:not([data-theme="light"]) .site-header.is-sticky {
+    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .category-strip,
+:root:not([data-theme="light"]) .category-strip,
+[data-theme="dark"] .hp-hero,
+:root:not([data-theme="light"]) .hp-hero,
+[data-theme="dark"] .hp-hero__tile,
+:root:not([data-theme="light"]) .hp-hero__tile {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .hp-hero__tile:hover,
+:root:not([data-theme="light"]) .hp-hero__tile:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .site-header { border-bottom-color: rgba(255, 255, 255, 0.08); }
+}
 .site-header__search-icon { display: block; }
 .site-header__search-icon--close { display: none; }
 .site-header__search-toggle[aria-expanded="true"] .site-header__search-icon--search { display: none; }
@@ -1766,6 +1853,72 @@ select:focus-visible {
     .quick-picks__grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ============================================================
+   MOBILE BOTTOM-TAB NAVIGATION (visible <768px only)
+   ============================================================ */
+.bottom-tabs {
+    display: none;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 95;
+    background: var(--warm-white);
+    border-top: 1px solid var(--mid-stone);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+.bottom-tabs__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 4px;
+    color: var(--slate);
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-top: 2px solid transparent;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+    min-height: 56px;
+}
+.bottom-tabs__item:hover { color: var(--forest); text-decoration: none; }
+.bottom-tabs__item.is-active {
+    color: var(--forest);
+    border-top-color: var(--cat-accent, var(--sage));
+}
+.bottom-tabs__icon {
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+}
+.bottom-tabs__icon svg {
+    width: 100%;
+    height: 100%;
+    color: currentColor;
+}
+.bottom-tabs__label {
+    line-height: 1.1;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .bottom-tabs { display: flex; }
+    /* Lift the page so the fixed back-to-top + bar don't cover content. */
+    body { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)); }
+    .back-to-top {
+        bottom: calc(72px + env(safe-area-inset-bottom, 0));
+    }
+    .sticky-buy-bar {
+        bottom: calc(64px + env(safe-area-inset-bottom, 0));
+    }
+}
+
 /* Article-level FAQ section (rendered from post meta) */
 .article-faqs {
     margin: var(--space-2xl) 0;
@@ -2406,11 +2559,93 @@ select:focus-visible {
     font-weight: 700;
 }
 
-.no-results { text-align: center; padding: var(--space-3xl) 0; }
-.no-results h2 { margin-bottom: var(--space-md); }
-.no-results p { color: var(--slate); margin-bottom: var(--space-xl); }
-.no-results__categories ul { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-sm); justify-content: center; margin-top: var(--space-md); }
-.no-results__categories a { color: var(--sage); }
+.no-results { padding: var(--space-2xl) 0; max-width: 720px; margin: 0 auto; }
+.no-results__lede {
+    font-size: 17px;
+    color: var(--charcoal);
+    margin-bottom: var(--space-2xl);
+}
+.no-results__heading {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--forest);
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--mid-stone);
+}
+.no-results__popular { margin-bottom: var(--space-2xl); }
+.no-results__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+.no-results__category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-sm);
+}
+.no-results__category-list li {
+    border-left: 3px solid var(--cat-accent, var(--sage));
+    background: var(--white);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.no-results__category-list a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--forest);
+    text-decoration: none;
+    font-weight: 600;
+}
+.no-results__category-list a:hover { color: var(--sage); text-decoration: none; }
+.no-results__count {
+    font-size: 12px;
+    color: var(--slate);
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+/* Search filter chips (above results) */
+.search-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--mid-stone);
+}
+.search-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--forest);
+    background: var(--white);
+    border: 1px solid var(--mid-stone);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.search-filter-chip:hover {
+    border-color: var(--cat-accent, var(--sage));
+    color: var(--cat-accent, var(--sage));
+    text-decoration: none;
+}
+.search-filter-chip.is-active {
+    background: var(--cat-accent, var(--sage));
+    border-color: var(--cat-accent, var(--sage));
+    color: var(--white);
+}
+.search-filter-chip.is-active:hover { color: var(--white); }
 
 /* ============================================================
    20. 404 PAGE

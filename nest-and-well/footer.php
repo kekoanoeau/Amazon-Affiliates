@@ -39,6 +39,8 @@
 
     </footer><!-- #colophon -->
 
+    <?php get_template_part( 'template-parts/nav/bottom-tabs' ); ?>
+
 </div><!-- #page -->
 
 <?php wp_footer(); ?>
