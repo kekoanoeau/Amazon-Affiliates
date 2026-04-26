@@ -223,6 +223,37 @@ get_header();
             <!-- Auto FAQ Accordion (from post meta) -->
             <?php get_template_part( 'template-parts/faq-list' ); ?>
 
+            <!-- Prev / next post navigation -->
+            <?php
+            $prev_post = get_previous_post( true );
+            $next_post = get_next_post( true );
+            if ( $prev_post || $next_post ) :
+            ?>
+            <nav class="post-nav" aria-label="<?php esc_attr_e( 'Continue reading', 'nest-and-well' ); ?>">
+                <?php if ( $prev_post ) : ?>
+                <a href="<?php echo esc_url( get_permalink( $prev_post ) ); ?>"
+                   class="post-nav__link post-nav__link--prev"
+                   rel="prev">
+                    <span class="post-nav__direction">&larr; <?php esc_html_e( 'Previous review', 'nest-and-well' ); ?></span>
+                    <span class="post-nav__title"><?php echo esc_html( get_the_title( $prev_post ) ); ?></span>
+                </a>
+                <?php else : ?>
+                <span></span>
+                <?php endif; ?>
+
+                <?php if ( $next_post ) : ?>
+                <a href="<?php echo esc_url( get_permalink( $next_post ) ); ?>"
+                   class="post-nav__link post-nav__link--next"
+                   rel="next">
+                    <span class="post-nav__direction"><?php esc_html_e( 'Next review', 'nest-and-well' ); ?> &rarr;</span>
+                    <span class="post-nav__title"><?php echo esc_html( get_the_title( $next_post ) ); ?></span>
+                </a>
+                <?php else : ?>
+                <span></span>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+
             <!-- End-of-article newsletter CTA -->
             <?php get_template_part( 'template-parts/newsletter-cta' ); ?>
 

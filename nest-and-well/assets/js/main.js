@@ -650,6 +650,47 @@
   }
 
   // ============================================================
+  // 7e. Comparison table — highlight the row with the highest score
+  // ============================================================
+  // Authors can also opt out by adding data-no-winner to a single
+  // .comparison-table-wrap.
+  function initComparisonWinners() {
+    $$('.comparison-table').forEach(function (table) {
+      if (table.closest('[data-no-winner]')) return;
+
+      var rows = table.querySelectorAll('tbody tr');
+      if (rows.length < 2) return;
+
+      var bestScore = -Infinity;
+      var bestRow   = null;
+
+      rows.forEach(function (row) {
+        var pill = row.querySelector('.comparison-table__score .score-pill');
+        if (!pill) return;
+        // Strip "/10" / non-numeric chars; the value can be "9.4/10" or "9.4".
+        var num = parseFloat(pill.textContent.replace(/[^\d.]/g, ''));
+        if (isNaN(num)) return;
+        if (num > bestScore) {
+          bestScore = num;
+          bestRow   = row;
+        }
+      });
+
+      if (bestRow) {
+        bestRow.classList.add('is-winner');
+        var nameCell = bestRow.querySelector('.comparison-table__name');
+        if (nameCell && !nameCell.querySelector('.comparison-table__win-mark')) {
+          var mark = document.createElement('span');
+          mark.className = 'comparison-table__win-mark';
+          mark.setAttribute('aria-label', 'Highest score');
+          mark.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          nameCell.insertBefore(mark, nameCell.firstChild);
+        }
+      }
+    });
+  }
+
+  // ============================================================
   // 7d. Star-rating left-to-right fill on viewport entry
   // ============================================================
   function initStarFillReveal() {
@@ -1104,6 +1145,7 @@
     initScrollReveal();
     initScoreCounters();
     initStarFillReveal();
+    initComparisonWinners();
   }
 
   if (document.readyState === 'loading') {
