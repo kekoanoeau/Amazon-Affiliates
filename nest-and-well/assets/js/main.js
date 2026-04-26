@@ -585,8 +585,15 @@
       }
     });
 
+    // Long-form review and buying-guide layouts get the TOC in the sticky
+    // sidebar; everything else gets the inline TOC.
+    var sidebar = $('.sidebar-sticky #secondary, .sidebar-sticky');
+    var isReview = document.body.classList.contains('is-review');
+    var isGuide  = $('.article-body--guide') !== null;
+    var useSidebar = sidebar && (isReview || isGuide || headings.length >= 4);
+
     var nav = document.createElement('nav');
-    nav.className = 'toc';
+    nav.className = useSidebar ? 'toc toc--sidebar widget' : 'toc toc--inline';
     nav.setAttribute('aria-label', 'Table of contents');
 
     var title = document.createElement('p');
@@ -597,6 +604,7 @@
     var list = document.createElement('ul');
     list.className = 'toc__list';
 
+    var verdictId = null;
     headings.forEach(function (h) {
       var li = document.createElement('li');
       li.className = 'toc__item toc__item--' + h.tagName.toLowerCase();
@@ -606,16 +614,62 @@
       a.textContent = h.textContent;
       li.appendChild(a);
       list.appendChild(li);
+
+      if (!verdictId && /verdict|final|takeaway|bottom\s*line/i.test(h.textContent)) {
+        verdictId = h.id;
+      }
     });
 
     nav.appendChild(list);
 
-    var firstP = content.querySelector('p');
-    if (firstP && firstP.nextSibling) {
-      content.insertBefore(nav, firstP.nextSibling);
-    } else {
-      content.insertBefore(nav, content.firstChild);
+    if (verdictId) {
+      var skip = document.createElement('a');
+      skip.href = '#' + verdictId;
+      skip.className = 'toc__skip';
+      skip.textContent = 'Skip to verdict ↓';
+      nav.appendChild(skip);
     }
+
+    if (useSidebar) {
+      var host = sidebar.querySelector('.sidebar__section');
+      if (host) {
+        sidebar.insertBefore(nav, host);
+      } else {
+        sidebar.insertBefore(nav, sidebar.firstChild);
+      }
+      initTocActiveTracking(nav, headings);
+    } else {
+      var firstP = content.querySelector('p');
+      if (firstP && firstP.nextSibling) {
+        content.insertBefore(nav, firstP.nextSibling);
+      } else {
+        content.insertBefore(nav, content.firstChild);
+      }
+    }
+  }
+
+  // Highlight the TOC link whose section is currently in view.
+  function initTocActiveTracking(nav, headings) {
+    if (!('IntersectionObserver' in window)) return;
+
+    var links = {};
+    nav.querySelectorAll('.toc__link').forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      links[id] = a;
+    });
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var link = links[entry.target.id];
+        if (!link) return;
+        if (entry.isIntersecting) {
+          Object.keys(links).forEach(function (k) { links[k].classList.remove('is-active'); });
+          link.classList.add('is-active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    headings.forEach(function (h) { observer.observe(h); });
   }
 
   // ============================================================

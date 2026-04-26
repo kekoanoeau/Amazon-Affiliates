@@ -176,7 +176,17 @@ function nest_well_schema_markup() {
         }
 
         $schemas[] = nest_well_breadcrumb_schema();
-    } elseif ( is_page() || is_category() || is_archive() ) {
+    } elseif ( is_page() ) {
+        $schemas[] = nest_well_breadcrumb_schema();
+
+        // Best-of buying-guide page → emit ItemList from [quick_pick] entries
+        if ( 'page-best-of.php' === get_page_template_slug( get_the_ID() ) ) {
+            $list = nest_well_buying_guide_itemlist_schema();
+            if ( $list ) {
+                $schemas[] = $list;
+            }
+        }
+    } elseif ( is_category() || is_archive() ) {
         $schemas[] = nest_well_breadcrumb_schema();
     }
 
@@ -457,4 +467,49 @@ function nest_well_get_faq_items( $item = null ) {
     }
 
     return $faq_items;
+}
+
+/**
+ * Build an ItemList schema from [quick_pick] shortcode entries on the page.
+ * Used by buying-guide pages to qualify for SERP carousel rich results.
+ *
+ * @return array|null Schema array or null if no picks found.
+ */
+function nest_well_buying_guide_itemlist_schema() {
+    $content = get_post_field( 'post_content', get_the_ID() );
+    if ( empty( $content ) ) {
+        return null;
+    }
+
+    if ( ! preg_match_all( '/\[quick_pick([^\]]*)\]/i', $content, $matches ) ) {
+        return null;
+    }
+
+    $items = array();
+    foreach ( $matches[1] as $i => $attr_str ) {
+        $atts = shortcode_parse_atts( $attr_str );
+        if ( empty( $atts['name'] ) ) {
+            continue;
+        }
+        $items[] = array(
+            '@type'    => 'ListItem',
+            'position' => $i + 1,
+            'name'     => wp_strip_all_tags( $atts['name'] ),
+            'url'      => isset( $atts['link'] ) ? esc_url_raw( $atts['link'] ) : get_permalink(),
+        );
+    }
+
+    if ( empty( $items ) ) {
+        return null;
+    }
+
+    return array(
+        '@context'         => 'https://schema.org',
+        '@type'            => 'ItemList',
+        'name'             => get_the_title(),
+        'url'              => get_permalink(),
+        'numberOfItems'    => count( $items ),
+        'itemListOrder'    => 'https://schema.org/ItemListOrderAscending',
+        'itemListElement'  => $items,
+    );
 }

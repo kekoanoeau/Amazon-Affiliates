@@ -57,6 +57,11 @@ defined( 'ABSPATH' ) || exit;
         <?php endif; ?>
     </div>
 
+    <!-- Explore Category -->
+    <div class="sidebar__section sidebar__section--explore">
+        <?php get_template_part( 'template-parts/explore-category' ); ?>
+    </div>
+
     <!-- Deal Alert Widget -->
     <?php if ( is_active_sidebar( 'sidebar-deal-alert' ) ) : ?>
     <div class="sidebar__section sidebar__section--deal-alert">

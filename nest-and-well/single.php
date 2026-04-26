@@ -103,6 +103,8 @@ get_header();
                                 aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
                             <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
                         </button>
+
+                        <?php nest_well_save_button( $post_id, 'inline' ); ?>
                     </div>
                 </div>
             </div><!-- .byline -->
@@ -202,6 +204,9 @@ get_header();
                 );
                 ?>
             </article>
+
+            <!-- Auto FAQ Accordion (from post meta) -->
+            <?php get_template_part( 'template-parts/faq-list' ); ?>
 
             <!-- Author Bio -->
             <?php get_template_part( 'template-parts/author-bio' ); ?>
