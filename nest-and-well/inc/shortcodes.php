@@ -91,10 +91,10 @@ function nest_well_product_box_shortcode( $atts ) {
 
                 <?php if ( $atts['rating'] ) : ?>
                 <div class="product-box__score-row">
-                    <span class="product-box__score-badge" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                    <span class="product-box__score-badge nw-num" data-score-target="<?php echo esc_attr( $atts['rating'] ); ?>" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
                         <meta itemprop="ratingValue" content="<?php echo esc_attr( $atts['rating'] ); ?>">
                         <meta itemprop="bestRating" content="10">
-                        <?php echo esc_html( $atts['rating'] ); ?>/10
+                        <span class="nw-score-num"><?php echo esc_html( $atts['rating'] ); ?></span>/10
                     </span>
                     <?php echo wp_kses_post( nest_well_star_rating_html( $atts['rating'] ) ); ?>
                     <?php if ( $atts['review_count'] ) : ?>
@@ -194,7 +194,7 @@ function nest_well_rating_shortcode( $atts ) {
     ob_start();
     ?>
     <span class="rating-badge">
-        <span class="rating-badge__score"><?php echo esc_html( number_format( $score, 1 ) ); ?>/10</span>
+        <span class="rating-badge__score nw-num" data-score-target="<?php echo esc_attr( number_format( $score, 1, '.', '' ) ); ?>"><span class="nw-score-num"><?php echo esc_html( number_format( $score, 1 ) ); ?></span>/10</span>
         <?php if ( $atts['label'] ) : ?>
         <span class="rating-badge__label"><?php echo esc_html( $atts['label'] ); ?></span>
         <?php endif; ?>

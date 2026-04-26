@@ -468,45 +468,204 @@
   }
 
   // ============================================================
-  // 7. Copy Link Button
+  // 7. Copy Link Button + "Copied ✓" toast
   // ============================================================
   function initCopyLink() {
     var copyButtons = $$('.share-buttons__item--copy');
 
+    function showToast(btn) {
+      var row = btn.closest('.share-buttons') || btn.parentNode;
+      if (!row) return;
+
+      // Replace any existing toast on the same row.
+      var existing = row.querySelector('.nw-copy-toast');
+      if (existing) existing.remove();
+
+      var toast = document.createElement('span');
+      toast.className = 'nw-copy-toast';
+      toast.setAttribute('role', 'status');
+      toast.textContent = 'Copied ✓';
+      row.appendChild(toast);
+
+      // Animation duration matches nw-toast-in keyframe (1.6s).
+      setTimeout(function () { toast.remove(); }, 1700);
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise(function (resolve, reject) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+        document.body.removeChild(ta);
+      });
+    }
+
     copyButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var url = btn.dataset.copyUrl || window.location.href;
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function () {
-            var original = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(function () {
-              btn.textContent = original;
-            }, 2000);
-          });
-        } else {
-          // Fallback for older browsers
-          var textarea = document.createElement('textarea');
-          textarea.value = url;
-          textarea.style.position = 'fixed';
-          textarea.style.opacity = '0';
-          document.body.appendChild(textarea);
-          textarea.select();
-          try {
-            document.execCommand('copy');
-            var original = btn.textContent;
-            btn.textContent = 'Copied!';
-            setTimeout(function () {
-              btn.textContent = original;
-            }, 2000);
-          } catch (e) {
-            // Silent fail
-          }
-          document.body.removeChild(textarea);
-        }
+        copyText(url).then(function () {
+          showToast(btn);
+        }).catch(function () { /* silent */ });
       });
     });
+  }
+
+  // ============================================================
+  // 7b. Scroll-reveal — fade-up on cards/sections via [data-reveal]
+  // ============================================================
+  function initScrollReveal() {
+    if (!('IntersectionObserver' in window)) return;
+
+    // Tag the entry points so authors don't have to remember the attribute.
+    var targets = [
+      '.article-card',
+      '.hp-hero__tile',
+      '.quick-picks__card',
+      '.explore-category__item',
+      '.review-summary--auto',
+      '.verdict',
+      '.newsletter-cta',
+      '.author-bio',
+      '.how-we-review',
+      '.faq-item'
+    ];
+    var els = $$(targets.join(','));
+
+    var groupCounter = new WeakMap();
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+
+    els.forEach(function (el) {
+      if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+
+      // Stagger siblings inside the same parent so a row of cards fades in
+      // left-to-right (~80ms apart, capped at 6 to avoid long delays).
+      var parent = el.parentElement;
+      if (parent) {
+        var n = (groupCounter.get(parent) || 0);
+        groupCounter.set(parent, n + 1);
+        if (n > 0 && n < 7) {
+          el.style.setProperty('--reveal-delay', (n * 80) + 'ms');
+        }
+      }
+      io.observe(el);
+    });
+  }
+
+  // ============================================================
+  // 7c. Animated score counters — count up from 0 when in view
+  // ============================================================
+  function initScoreCounters() {
+    if (!('IntersectionObserver' in window)) return;
+
+    // Six score surfaces all expose data-score-target; some wrap the digits
+    // in a child .nw-score-num so we don't trample sibling labels like "/10".
+    var els = $$('[data-score-target]');
+    if (!els.length) return;
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function format(n) {
+      // 1 decimal unless the target is integer (e.g. "10").
+      return Number.isInteger(n) ? String(n) : n.toFixed(1);
+    }
+
+    function getDigitNode(el) {
+      return el.querySelector('.nw-score-num') || el;
+    }
+
+    function runCounter(el) {
+      var target = parseFloat(el.getAttribute('data-score-target'));
+      if (isNaN(target)) return;
+
+      var node = getDigitNode(el);
+
+      // Animate the optional verdict ring alongside the number.
+      var ringHost = el.classList.contains('verdict__score-ring') ? el : null;
+      var ringFill = ringHost ? ringHost.querySelector('.verdict__ring-fill') : null;
+      var ringPct  = ringHost ? parseFloat(ringHost.getAttribute('data-score-pct') || '0') : 0;
+
+      if (reduceMotion) {
+        node.textContent = format(target);
+        if (ringFill) ringFill.style.strokeDashoffset = String(100 - ringPct);
+        return;
+      }
+
+      var duration = 750;
+      var start = null;
+      function step(ts) {
+        if (start === null) start = ts;
+        var t = Math.min(1, (ts - start) / duration);
+        var eased = easeOut(t);
+        var current = target * eased;
+        node.textContent = format(current);
+        if (ringFill) {
+          // pathLength=100 ⇒ stroke-dashoffset 100 = empty, 0 = full.
+          ringFill.style.strokeDashoffset = String(100 - (ringPct * eased));
+        }
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        runCounter(entry.target);
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -20% 0px', threshold: 0.2 });
+
+    els.forEach(function (el) {
+      // Reset to 0.0 so the count-up reads as a real animation; if an
+      // observer never fires (e.g. element is hidden), the original value
+      // is preserved by data-score-target.
+      var node = getDigitNode(el);
+      if (!reduceMotion && node) {
+        var t = parseFloat(el.getAttribute('data-score-target'));
+        node.textContent = Number.isInteger(t) ? '0' : '0.0';
+      }
+      io.observe(el);
+    });
+  }
+
+  // ============================================================
+  // 7d. Star-rating left-to-right fill on viewport entry
+  // ============================================================
+  function initStarFillReveal() {
+    if (!('IntersectionObserver' in window)) return;
+    var groups = $$('.star-rating');
+    if (!groups.length) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.4 });
+
+    groups.forEach(function (g) { io.observe(g); });
   }
 
   // ============================================================
@@ -942,6 +1101,9 @@
     initThemeToggle();
     initPinterestOverlay();
     initNativeShare();
+    initScrollReveal();
+    initScoreCounters();
+    initStarFillReveal();
   }
 
   if (document.readyState === 'loading') {

@@ -30,10 +30,10 @@ require_once NEST_WELL_DIR . '/inc/review-meta.php';
  * Enqueue theme scripts and styles.
  */
 function nest_well_enqueue_assets() {
-    // Google Fonts — Inter (weights 400, 500, 700)
+    // Google Fonts — Inter for body + JetBrains Mono for numeric data
     wp_enqueue_style(
         'nest-well-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap',
         array(),
         null
     );

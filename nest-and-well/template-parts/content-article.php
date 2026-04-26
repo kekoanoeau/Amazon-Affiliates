@@ -112,7 +112,7 @@ if ( 'editors-choice' === $review_badge ) {
             <?php if ( $review_score ) : ?>
             <div class="article-card__rating">
                 <?php echo wp_kses_post( nest_well_star_rating_html( (float) $review_score ) ); ?>
-                <span class="article-card__score"><?php echo esc_html( number_format( (float) $review_score, 1 ) ); ?>/10</span>
+                <span class="article-card__score nw-num" data-score-target="<?php echo esc_attr( number_format( (float) $review_score, 1, '.', '' ) ); ?>"><span class="nw-score-num"><?php echo esc_html( number_format( (float) $review_score, 1 ) ); ?></span>/10</span>
             </div>
             <?php endif; ?>
 

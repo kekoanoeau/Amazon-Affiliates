@@ -55,8 +55,8 @@ $buy_url = $product_asin ? nest_well_amazon_url( $product_asin ) : '';
         <?php endif; ?>
 
         <div class="review-summary__score-wrap">
-            <div class="review-summary__score">
-                <?php echo esc_html( number_format( (float) $score, 1 ) ); ?><span>/10</span>
+            <div class="review-summary__score nw-num" data-score-target="<?php echo esc_attr( number_format( (float) $score, 1, '.', '' ) ); ?>">
+                <span class="nw-score-num"><?php echo esc_html( number_format( (float) $score, 1 ) ); ?></span><span class="review-summary__score-out">/10</span>
             </div>
             <?php echo wp_kses_post( nest_well_star_rating_html( (float) $score ) ); ?>
         </div>

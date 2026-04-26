@@ -48,10 +48,20 @@ $buy_url = $product_asin ? nest_well_amazon_url( $product_asin ) : '';
         <div class="verdict__body">
             <?php if ( $score || $badge ) : ?>
             <div class="verdict__score-col">
-                <?php if ( $score ) : ?>
-                <div class="verdict__score">
-                    <span class="verdict__score-value"><?php echo esc_html( number_format( (float) $score, 1 ) ); ?></span>
-                    <span class="verdict__score-out">/10</span>
+                <?php if ( $score ) :
+                    $score_pct = max( 0, min( 100, (float) $score * 10 ) );
+                    ?>
+                <div class="verdict__score-ring" data-score-target="<?php echo esc_attr( number_format( (float) $score, 1, '.', '' ) ); ?>" data-score-pct="<?php echo esc_attr( $score_pct ); ?>" role="img" aria-label="<?php echo esc_attr( sprintf( __( '%s out of 10', 'nest-and-well' ), number_format( (float) $score, 1 ) ) ); ?>">
+                    <svg class="verdict__ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+                        <circle class="verdict__ring-track" cx="50" cy="50" r="44" fill="none" stroke-width="6"></circle>
+                        <circle class="verdict__ring-fill" cx="50" cy="50" r="44" fill="none" stroke-width="6"
+                                stroke-dasharray="276.46" stroke-dashoffset="276.46"
+                                pathLength="100" transform="rotate(-90 50 50)"></circle>
+                    </svg>
+                    <div class="verdict__score">
+                        <span class="verdict__score-value nw-num"><?php echo esc_html( number_format( (float) $score, 1 ) ); ?></span>
+                        <span class="verdict__score-out nw-num">/10</span>
+                    </div>
                 </div>
                 <?php echo wp_kses_post( nest_well_star_rating_html( (float) $score ) ); ?>
                 <?php endif; ?>
