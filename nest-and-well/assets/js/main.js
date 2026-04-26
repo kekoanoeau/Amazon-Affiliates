@@ -208,6 +208,7 @@
     var endMsg   = $('.js-infinite-end');
 
     if (!sentinel || !grid) return;
+    if (sentinel.classList.contains('js-discovery-sentinel')) return; // owned by discovery.js
     if (!('IntersectionObserver' in window)) return; // graceful no-op for old browsers
 
     var categoryId = sentinel.dataset.categoryId || '';

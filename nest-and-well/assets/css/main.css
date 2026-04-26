@@ -4507,3 +4507,317 @@ select:focus-visible {
     .article-tabs__tab { padding: 7px 14px; font-size: 13px; }
 }
 
+/* ============================================================
+   32. DISCOVERY FEED
+   Image-first masonry browse module rendered below the editorial
+   hero on the homepage. Borrows TIWIB's density and image-first
+   hierarchy without the red palette or snarky voice.
+
+   Layout: pure CSS column-count masonry (no JS lib).
+   Card heights: fixed aspect-ratio per category tier prevents CLS
+   while still creating mixed-height masonry feel.
+   ============================================================ */
+
+.discovery-feed {
+    padding: var(--space-3xl) 0 var(--space-4xl);
+    background-color: var(--warm-white);
+}
+
+.discovery-feed__header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.discovery-feed__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: var(--space-sm);
+    letter-spacing: -0.01em;
+}
+
+.discovery-feed__subtitle {
+    font-size: 16px;
+    color: var(--slate);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+/* Masonry container — column-count + break-inside:avoid */
+.discovery-feed__masonry {
+    column-gap: var(--space-md);
+    margin: 0 auto;
+}
+
+.discovery-feed[data-density="cozy"]  .discovery-feed__masonry { column-count: 3; column-gap: var(--space-md); }
+.discovery-feed[data-density="dense"] .discovery-feed__masonry { column-count: 4; column-gap: var(--space-sm); }
+.discovery-feed[data-density="tight"] .discovery-feed__masonry { column-count: 5; column-gap: var(--space-xs); }
+
+/* Sentinel + loading + end-of-feed */
+.discovery-feed__sentinel {
+    height: 1px;
+    margin-top: var(--space-xl);
+}
+
+.discovery-feed__loading {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+.discovery-feed__loading[hidden] {
+    display: none;
+}
+
+.discovery-feed__loading .skeleton-card {
+    border-radius: var(--radius-md);
+    background-color: var(--lt-stone);
+    overflow: hidden;
+}
+
+.discovery-feed__end {
+    text-align: center;
+    padding: var(--space-2xl) 0;
+    color: var(--slate);
+    font-size: 14px;
+}
+
+.discovery-feed__end[hidden] {
+    display: none;
+}
+
+/* Card base — image-first, click target = title link */
+.discovery-card {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: var(--space-md);
+    background-color: var(--lt-stone);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.discovery-card:hover,
+.discovery-card:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(26, 60, 52, 0.12);
+}
+
+/* Media wrap — aspect ratio per category tier */
+.discovery-card__media {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--mid-stone);
+}
+
+.discovery-card__media--tall   { aspect-ratio: 4 / 5; }
+.discovery-card__media--square { aspect-ratio: 1 / 1; }
+.discovery-card__media--wide   { aspect-ratio: 3 / 2; }
+
+.discovery-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-med);
+}
+
+.discovery-card:hover .discovery-card__image,
+.discovery-card:focus-within .discovery-card__image {
+    transform: scale(1.04);
+}
+
+.discovery-card__image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--mid-stone) 0%, var(--lt-stone) 100%);
+}
+
+/* Top-right badge (Editor's Choice etc.) — reuses .badge palette */
+.discovery-card__badge {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 2;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Bottom-left price pill */
+.discovery-card__price-pill {
+    position: absolute;
+    bottom: var(--space-sm);
+    left: var(--space-sm);
+    z-index: 2;
+    background-color: var(--white);
+    color: var(--charcoal);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* Bottom-right rating pill */
+.discovery-card__rating-pill {
+    position: absolute;
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 2;
+    background-color: var(--amber);
+    color: var(--charcoal);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    line-height: 1;
+}
+
+/* Overlay — gradient + title + CTA, slides up on hover/focus */
+.discovery-card__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-md);
+    background: linear-gradient(180deg, transparent 50%, rgba(26, 60, 52, 0.85) 100%);
+    color: var(--white);
+    transform: translateY(calc(100% - 60px));
+    transition: transform var(--transition-med);
+    z-index: 1;
+}
+
+.discovery-card:hover .discovery-card__overlay,
+.discovery-card:focus-within .discovery-card__overlay {
+    transform: translateY(0);
+    background: linear-gradient(180deg, transparent 0%, rgba(26, 60, 52, 0.92) 60%);
+}
+
+@media (hover: none) {
+    .discovery-card__overlay {
+        transform: translateY(0);
+        background: linear-gradient(180deg, transparent 30%, rgba(26, 60, 52, 0.88) 100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .discovery-card,
+    .discovery-card__image,
+    .discovery-card__overlay {
+        transition: none;
+    }
+    .discovery-card__overlay {
+        transform: translateY(0);
+        background: linear-gradient(180deg, transparent 30%, rgba(26, 60, 52, 0.88) 100%);
+    }
+}
+
+.discovery-card__title {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #FFFFFF;
+    margin: 0 0 var(--space-sm);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.discovery-card__title-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Make whole card clickable while keeping CTA as a separate tab stop */
+.discovery-card__title-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.discovery-card__title-link:hover,
+.discovery-card__title-link:focus {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
+/* CTA — sage solid for BUY, sage outline for READ REVIEW */
+.discovery-card__cta {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    align-self: flex-start;
+}
+
+.discovery-card__cta--buy {
+    background-color: var(--sage);
+    color: #FFFFFF;
+    border: 2px solid var(--sage);
+}
+
+.discovery-card__cta--buy:hover,
+.discovery-card__cta--buy:focus {
+    background-color: var(--forest);
+    border-color: var(--forest);
+    color: #FFFFFF;
+}
+
+.discovery-card__cta--review {
+    background-color: transparent;
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+}
+
+.discovery-card__cta--review:hover,
+.discovery-card__cta--review:focus {
+    background-color: #FFFFFF;
+    color: var(--forest);
+}
+
+/* Editor's Choice / Best Value variant trim */
+.discovery-card--editors-choice { box-shadow: inset 0 3px 0 var(--amber); }
+.discovery-card--best-value     { box-shadow: inset 0 3px 0 var(--moss); }
+
+/* Responsive — masonry collapses gracefully */
+@media (max-width: 1023px) {
+    .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 3; column-gap: var(--space-sm); }
+    .discovery-card__overlay { transform: translateY(0); background: linear-gradient(180deg, transparent 30%, rgba(26, 60, 52, 0.88) 100%); }
+}
+
+@media (max-width: 767px) {
+    .discovery-feed { padding: var(--space-2xl) 0; }
+    .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 2; column-gap: var(--space-sm); }
+    .discovery-feed__title { font-size: 22px; }
+    .discovery-card__title { font-size: 14px; }
+}
+
+@media (max-width: 359px) {
+    .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 1; }
+}
+
