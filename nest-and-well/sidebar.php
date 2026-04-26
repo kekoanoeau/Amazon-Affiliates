@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
             <p class="sidebar-email-default__desc">
                 <?php esc_html_e( 'Weekly reviews and deals, no spam.', 'nest-and-well' ); ?>
             </p>
-            <form class="sidebar-email-form" action="#" method="post">
+            <form class="sidebar-email-form js-subscribe-form" data-source="sidebar" novalidate>
                 <label for="sidebar-email" class="screen-reader-text">
                     <?php esc_html_e( 'Email address', 'nest-and-well' ); ?>
                 </label>
@@ -34,10 +34,12 @@ defined( 'ABSPATH' ) || exit;
                        name="email"
                        class="sidebar-email-form__input"
                        placeholder="<?php esc_attr_e( 'Your email address', 'nest-and-well' ); ?>"
+                       autocomplete="email"
                        required>
                 <button type="submit" class="sidebar-email-form__submit btn btn--sage">
                     <?php esc_html_e( 'Subscribe', 'nest-and-well' ); ?>
                 </button>
+                <p class="sidebar-email-form__feedback" role="status" aria-live="polite" hidden></p>
             </form>
         </div>
     </div>
@@ -53,6 +55,11 @@ defined( 'ABSPATH' ) || exit;
             <?php nest_well_top_picks_default( get_the_ID() ); ?>
         </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Explore Category -->
+    <div class="sidebar__section sidebar__section--explore">
+        <?php get_template_part( 'template-parts/explore-category' ); ?>
     </div>
 
     <!-- Deal Alert Widget -->

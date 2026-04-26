@@ -103,6 +103,8 @@ get_header();
                                 aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
                             <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
                         </button>
+
+                        <?php nest_well_save_button( $post_id, 'inline' ); ?>
                     </div>
                 </div>
             </div><!-- .byline -->
@@ -111,6 +113,11 @@ get_header();
             <div class="article-head__disclosure">
                 <?php get_template_part( 'template-parts/affiliate-disclosure' ); ?>
             </div>
+
+            <!-- How We Review (review posts only) -->
+            <?php if ( $review_score ) : ?>
+                <?php get_template_part( 'template-parts/how-we-review' ); ?>
+            <?php endif; ?>
 
         </div><!-- .container -->
     </div><!-- .article-head -->
@@ -160,6 +167,11 @@ get_header();
             </div>
             <?php endif; ?>
 
+            <!-- Auto Review Summary (review posts only; skipped if shortcode used in content) -->
+            <?php if ( $review_score ) : ?>
+                <?php get_template_part( 'template-parts/review-summary-meta' ); ?>
+            <?php endif; ?>
+
             <!-- Article Body -->
             <article id="post-<?php the_ID(); ?>" <?php post_class( 'article-body' ); ?>>
                 <div class="article-body__content entry-content">
@@ -192,6 +204,12 @@ get_header();
                 );
                 ?>
             </article>
+
+            <!-- Auto FAQ Accordion (from post meta) -->
+            <?php get_template_part( 'template-parts/faq-list' ); ?>
+
+            <!-- Author Bio -->
+            <?php get_template_part( 'template-parts/author-bio' ); ?>
 
             <!-- Related Posts -->
             <?php get_template_part( 'template-parts/related-posts' ); ?>

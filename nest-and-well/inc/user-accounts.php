@@ -257,3 +257,49 @@ function nest_well_saved_count_badge() {
         echo '<span class="account-saved-count" aria-label="' . esc_attr( sprintf( _n( '%d saved article', '%d saved articles', $count, 'nest-and-well' ), $count ) ) . '">' . esc_html( $count ) . '</span>';
     }
 }
+
+// ============================================================
+// SAVE BUTTON RENDERER
+// ============================================================
+
+/**
+ * Render a save / unsave toggle button.
+ * Wired by assets/js/accounts.js — buttons share state across the page via
+ * data-post-id, so duplicates (card + single) stay in sync after toggling.
+ *
+ * @param int    $post_id Post ID to save.
+ * @param string $variant Visual variant: 'icon' (default) or 'inline' (with label).
+ */
+function nest_well_save_button( $post_id = 0, $variant = 'icon' ) {
+    $post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+    if ( ! $post_id ) {
+        return;
+    }
+
+    $is_saved   = is_user_logged_in() && nest_well_is_post_saved( $post_id );
+    $logged_in  = is_user_logged_in();
+    $aria_label = $is_saved
+        ? __( 'Remove from saved', 'nest-and-well' )
+        : ( $logged_in ? __( 'Save article', 'nest-and-well' ) : __( 'Log in to save', 'nest-and-well' ) );
+
+    $classes = array( 'save-article-btn', 'save-btn--' . sanitize_html_class( $variant ) );
+    if ( $is_saved ) {
+        $classes[] = 'is-saved';
+    }
+    ?>
+    <button type="button"
+            class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
+            data-post-id="<?php echo esc_attr( $post_id ); ?>"
+            aria-label="<?php echo esc_attr( $aria_label ); ?>"
+            aria-pressed="<?php echo $is_saved ? 'true' : 'false'; ?>">
+        <svg class="save-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <?php if ( 'inline' === $variant ) : ?>
+        <span class="save-btn__label">
+            <?php echo esc_html( $is_saved ? __( 'Saved', 'nest-and-well' ) : __( 'Save', 'nest-and-well' ) ); ?>
+        </span>
+        <?php endif; ?>
+    </button>
+    <?php
+}

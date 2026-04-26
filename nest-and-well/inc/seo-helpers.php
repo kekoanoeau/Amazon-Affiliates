@@ -176,7 +176,17 @@ function nest_well_schema_markup() {
         }
 
         $schemas[] = nest_well_breadcrumb_schema();
-    } elseif ( is_page() || is_category() || is_archive() ) {
+    } elseif ( is_page() ) {
+        $schemas[] = nest_well_breadcrumb_schema();
+
+        // Best-of buying-guide page → emit ItemList from [quick_pick] entries
+        if ( 'page-best-of.php' === get_page_template_slug( get_the_ID() ) ) {
+            $list = nest_well_buying_guide_itemlist_schema();
+            if ( $list ) {
+                $schemas[] = $list;
+            }
+        }
+    } elseif ( is_category() || is_archive() ) {
         $schemas[] = nest_well_breadcrumb_schema();
     }
 
@@ -270,12 +280,13 @@ function nest_well_article_schema() {
  * @return array Schema array.
  */
 function nest_well_review_schema() {
-    $post_id      = get_the_ID();
-    $score        = (float) get_post_meta( $post_id, '_review_score', true );
-    $product_name = get_post_meta( $post_id, '_product_name', true );
-    $product_asin = get_post_meta( $post_id, '_product_asin', true );
-    $last_updated = get_post_meta( $post_id, '_last_updated', true );
-    $image        = nest_well_get_og_image();
+    $post_id       = get_the_ID();
+    $score         = (float) get_post_meta( $post_id, '_review_score', true );
+    $product_name  = get_post_meta( $post_id, '_product_name', true );
+    $product_asin  = get_post_meta( $post_id, '_product_asin', true );
+    $product_price = get_post_meta( $post_id, '_product_price', true );
+    $last_updated  = get_post_meta( $post_id, '_last_updated', true );
+    $image         = nest_well_get_og_image();
 
     $author_id   = get_post_field( 'post_author', $post_id );
     $author_name = get_the_author_meta( 'display_name', $author_id );
@@ -321,6 +332,29 @@ function nest_well_review_schema() {
     if ( $product_asin ) {
         $schema['url'] = nest_well_amazon_url( $product_asin );
     }
+
+    // Offer schema — unlocks price snippets in Google SERPs.
+    $offer_url = $product_asin ? nest_well_amazon_url( $product_asin ) : get_permalink();
+    $offer     = array(
+        '@type'         => 'Offer',
+        'url'           => $offer_url,
+        'availability'  => 'https://schema.org/InStock',
+        'priceCurrency' => apply_filters( 'nest_well_offer_currency', 'USD' ),
+        'seller'        => array(
+            '@type' => 'Organization',
+            'name'  => 'Amazon',
+        ),
+    );
+
+    if ( $product_price ) {
+        $price_numeric = preg_replace( '/[^0-9.]/', '', $product_price );
+        if ( '' !== $price_numeric ) {
+            $offer['price']            = $price_numeric;
+            $offer['priceValidUntil']  = gmdate( 'Y-12-31' );
+        }
+    }
+
+    $schema['offers'] = $offer;
 
     return $schema;
 }
@@ -433,4 +467,49 @@ function nest_well_get_faq_items( $item = null ) {
     }
 
     return $faq_items;
+}
+
+/**
+ * Build an ItemList schema from [quick_pick] shortcode entries on the page.
+ * Used by buying-guide pages to qualify for SERP carousel rich results.
+ *
+ * @return array|null Schema array or null if no picks found.
+ */
+function nest_well_buying_guide_itemlist_schema() {
+    $content = get_post_field( 'post_content', get_the_ID() );
+    if ( empty( $content ) ) {
+        return null;
+    }
+
+    if ( ! preg_match_all( '/\[quick_pick([^\]]*)\]/i', $content, $matches ) ) {
+        return null;
+    }
+
+    $items = array();
+    foreach ( $matches[1] as $i => $attr_str ) {
+        $atts = shortcode_parse_atts( $attr_str );
+        if ( empty( $atts['name'] ) ) {
+            continue;
+        }
+        $items[] = array(
+            '@type'    => 'ListItem',
+            'position' => $i + 1,
+            'name'     => wp_strip_all_tags( $atts['name'] ),
+            'url'      => isset( $atts['link'] ) ? esc_url_raw( $atts['link'] ) : get_permalink(),
+        );
+    }
+
+    if ( empty( $items ) ) {
+        return null;
+    }
+
+    return array(
+        '@context'         => 'https://schema.org',
+        '@type'            => 'ItemList',
+        'name'             => get_the_title(),
+        'url'              => get_permalink(),
+        'numberOfItems'    => count( $items ),
+        'itemListOrder'    => 'https://schema.org/ItemListOrderAscending',
+        'itemListElement'  => $items,
+    );
 }

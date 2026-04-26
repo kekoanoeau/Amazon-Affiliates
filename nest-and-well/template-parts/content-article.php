@@ -92,6 +92,8 @@ if ( 'editors-choice' === $review_badge ) {
                         aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
                     <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
                 </button>
+
+                <?php nest_well_save_button( $post_id, 'icon' ); ?>
             </div>
 
             <!-- Middle: Star rating (when present) -->

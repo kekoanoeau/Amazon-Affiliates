@@ -382,15 +382,18 @@ function nest_well_comparison_table_shortcode( $atts, $content = '' ) {
         <?php if ( $atts['title'] ) : ?>
         <h3 class="comparison-table__title"><?php echo esc_html( $atts['title'] ); ?></h3>
         <?php endif; ?>
-        <div class="comparison-table-scroll">
+        <div class="comparison-table-scroll" tabindex="0" role="region" aria-label="<?php echo esc_attr( $atts['title'] ? $atts['title'] : __( 'Product comparison', 'nest-and-well' ) ); ?>">
             <table class="comparison-table">
+                <?php if ( $atts['title'] ) : ?>
+                <caption class="screen-reader-text"><?php echo esc_html( $atts['title'] ); ?></caption>
+                <?php endif; ?>
                 <thead>
                     <tr>
-                        <th><?php esc_html_e( 'Product', 'nest-and-well' ); ?></th>
-                        <th><?php esc_html_e( 'Score', 'nest-and-well' ); ?></th>
-                        <th><?php esc_html_e( 'Price', 'nest-and-well' ); ?></th>
-                        <th><?php esc_html_e( 'Best For', 'nest-and-well' ); ?></th>
-                        <th><?php esc_html_e( 'Action', 'nest-and-well' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Product', 'nest-and-well' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Score', 'nest-and-well' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Price', 'nest-and-well' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Best For', 'nest-and-well' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Action', 'nest-and-well' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -485,38 +488,59 @@ function nest_well_quick_picks_shortcode( $atts, $content = '' ) {
 
     ob_start();
     ?>
-    <div class="quick-picks">
+    <section class="quick-picks" aria-labelledby="quick-picks-title-<?php echo esc_attr( wp_unique_id() ); ?>">
         <div class="quick-picks__header">
-            <span class="quick-picks__icon" aria-hidden="true">&#9776;</span>
-            <h3 class="quick-picks__title"><?php echo esc_html( $atts['title'] ); ?></h3>
+            <span class="quick-picks__icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <h3 id="quick-picks-title-<?php echo esc_attr( wp_unique_id() ); ?>" class="quick-picks__title">
+                <?php echo esc_html( $atts['title'] ); ?>
+            </h3>
         </div>
-        <ul class="quick-picks__list">
-            <?php foreach ( $picks as $pick ) : ?>
-            <li class="quick-picks__item">
+        <ol class="quick-picks__grid">
+            <?php foreach ( $picks as $i => $pick ) : ?>
+            <li class="quick-picks__card">
                 <?php if ( $pick['type'] ) : ?>
-                <span class="quick-picks__type"><?php echo esc_html( $pick['type'] ); ?>:</span>
+                <span class="quick-picks__type"><?php echo esc_html( $pick['type'] ); ?></span>
                 <?php endif; ?>
-                <span class="quick-picks__name">
+
+                <h4 class="quick-picks__name">
                     <?php if ( $pick['link'] ) : ?>
                     <a href="<?php echo esc_url( $pick['link'] ); ?>"
                        target="_blank"
-                       rel="nofollow noopener sponsored">
+                       rel="nofollow noopener sponsored"
+                       data-affiliate="amazon">
                         <?php echo esc_html( $pick['name'] ); ?>
                     </a>
                     <?php else : ?>
                     <?php echo esc_html( $pick['name'] ); ?>
                     <?php endif; ?>
-                </span>
+                </h4>
+
                 <?php if ( $pick['desc'] ) : ?>
-                <span class="quick-picks__desc">&mdash; <?php echo esc_html( $pick['desc'] ); ?></span>
+                <p class="quick-picks__desc"><?php echo esc_html( $pick['desc'] ); ?></p>
                 <?php endif; ?>
-                <?php if ( $pick['price'] ) : ?>
-                <span class="quick-picks__price"><?php echo esc_html( $pick['price'] ); ?></span>
-                <?php endif; ?>
+
+                <div class="quick-picks__footer">
+                    <?php if ( $pick['price'] ) : ?>
+                    <span class="quick-picks__price"><?php echo esc_html( $pick['price'] ); ?></span>
+                    <?php endif; ?>
+                    <?php if ( $pick['link'] ) : ?>
+                    <a href="<?php echo esc_url( $pick['link'] ); ?>"
+                       class="quick-picks__cta"
+                       target="_blank"
+                       rel="nofollow noopener sponsored"
+                       data-affiliate="amazon"
+                       aria-label="<?php echo esc_attr( sprintf( __( 'Check price for %s', 'nest-and-well' ), $pick['name'] ) ); ?>">
+                        <?php esc_html_e( 'Check price', 'nest-and-well' ); ?>
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                    <?php endif; ?>
+                </div>
             </li>
             <?php endforeach; ?>
-        </ul>
-    </div>
+        </ol>
+    </section>
     <?php
     return ob_get_clean();
 }

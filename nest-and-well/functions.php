@@ -21,6 +21,9 @@ require_once NEST_WELL_DIR . '/inc/affiliate-helpers.php';
 require_once NEST_WELL_DIR . '/inc/seo-helpers.php';
 require_once NEST_WELL_DIR . '/inc/shortcodes.php';
 require_once NEST_WELL_DIR . '/inc/category-feed-meta.php';
+require_once NEST_WELL_DIR . '/inc/email-capture.php';
+require_once NEST_WELL_DIR . '/inc/user-accounts.php';
+require_once NEST_WELL_DIR . '/inc/faq-meta.php';
 
 /**
  * Enqueue theme scripts and styles.
@@ -125,6 +128,18 @@ function nest_well_preload_fonts() {
     <?php
 }
 add_action( 'wp_head', 'nest_well_preload_fonts', 1 );
+
+/**
+ * Apply the user's persisted theme preference before CSS loads.
+ * Runs synchronously in <head> to avoid a flash of light theme on
+ * dark-mode users.
+ */
+function nest_well_theme_preference_bootstrap() {
+    ?>
+    <script>(function(){try{var p=localStorage.getItem('nest-well-theme');if(p==='dark'||p==='light'){document.documentElement.setAttribute('data-theme',p);}}catch(e){}})();</script>
+    <?php
+}
+add_action( 'wp_head', 'nest_well_theme_preference_bootstrap', 0 );
 
 /**
  * Remove WordPress bloat from wp_head.
