@@ -63,6 +63,11 @@
     var links = document.querySelectorAll(affiliateSelectors.join(', '));
 
     links.forEach(function (link) {
+      // Dedup: the discovery feed re-runs this after appending new cards;
+      // skip links that already have a click listener bound.
+      if (link.dataset.nwTracked) return;
+      link.dataset.nwTracked = '1';
+
       link.addEventListener('click', function (e) {
         var productName = link.dataset.product || link.textContent.trim();
         var url = link.href;
@@ -184,5 +189,11 @@
   } else {
     init();
   }
+
+  // Re-bind when the discovery feed appends new cards via REST.
+  document.addEventListener('nestwell:discovery_appended', function () {
+    enhanceAmazonLinks();
+    initAffiliateTracking();
+  });
 
 })();

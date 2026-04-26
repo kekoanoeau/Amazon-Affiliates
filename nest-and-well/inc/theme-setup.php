@@ -99,6 +99,12 @@ function nest_well_image_sizes() {
 
     // Product image — square
     add_image_size( 'product-image', 400, 400, true );
+
+    // Discovery feed — tall card (4:5)
+    add_image_size( 'discovery-tall', 600, 750, true );
+
+    // Discovery feed — square card (1:1)
+    add_image_size( 'discovery-square', 600, 600, true );
 }
 add_action( 'after_setup_theme', 'nest_well_image_sizes' );
 
@@ -112,9 +118,11 @@ function nest_well_add_image_sizes_to_chooser( $sizes ) {
     return array_merge(
         $sizes,
         array(
-            'card-thumbnail' => esc_html__( 'Card Thumbnail (600x400)', 'nest-and-well' ),
-            'hero-image'     => esc_html__( 'Hero Image (1200x675)', 'nest-and-well' ),
-            'product-image'  => esc_html__( 'Product Image (400x400)', 'nest-and-well' ),
+            'card-thumbnail'   => esc_html__( 'Card Thumbnail (600x400)', 'nest-and-well' ),
+            'hero-image'       => esc_html__( 'Hero Image (1200x675)', 'nest-and-well' ),
+            'product-image'    => esc_html__( 'Product Image (400x400)', 'nest-and-well' ),
+            'discovery-tall'   => esc_html__( 'Discovery Tall (600x750)', 'nest-and-well' ),
+            'discovery-square' => esc_html__( 'Discovery Square (600x600)', 'nest-and-well' ),
         )
     );
 }

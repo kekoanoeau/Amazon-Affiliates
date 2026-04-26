@@ -394,6 +394,129 @@ function nest_well_customizer_register( $wp_customize ) {
         )
     );
 
+    // ----- Discovery Feed (image-first masonry below hero) -----
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_enabled',
+        array(
+            'default'           => true,
+            'sanitize_callback' => 'nest_well_sanitize_checkbox',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_enabled',
+        array(
+            'label'       => esc_html__( 'Show Discovery Feed below hero', 'nest-and-well' ),
+            'description' => esc_html__( 'Image-first masonry browse module for product discovery.', 'nest-and-well' ),
+            'section'     => 'nest_well_homepage',
+            'type'        => 'checkbox',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_headline',
+        array(
+            'default'           => __( 'More to Explore', 'nest-and-well' ),
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport'         => 'postMessage',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_headline',
+        array(
+            'label'   => esc_html__( 'Discovery feed headline', 'nest-and-well' ),
+            'section' => 'nest_well_homepage',
+            'type'    => 'text',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_subtitle',
+        array(
+            'default'           => __( "Browse what we're testing this week.", 'nest-and-well' ),
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport'         => 'postMessage',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_subtitle',
+        array(
+            'label'   => esc_html__( 'Discovery feed subtitle', 'nest-and-well' ),
+            'section' => 'nest_well_homepage',
+            'type'    => 'text',
+        )
+    );
+
+    // Source: build choices from the existing top-level categories
+    $source_choices = array( 'latest' => esc_html__( 'Latest posts', 'nest-and-well' ) );
+    $source_cats    = get_categories( array( 'hide_empty' => false ) );
+    if ( ! is_wp_error( $source_cats ) && ! empty( $source_cats ) ) {
+        foreach ( $source_cats as $cat ) {
+            $source_choices[ 'cat-' . $cat->term_id ] = $cat->name;
+        }
+    }
+    $source_choices['mixed'] = esc_html__( 'Mixed', 'nest-and-well' );
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_source',
+        array(
+            'default'           => 'latest',
+            'sanitize_callback' => 'nest_well_discovery_sanitize_source',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_source',
+        array(
+            'label'   => esc_html__( 'Discovery source', 'nest-and-well' ),
+            'section' => 'nest_well_homepage',
+            'type'    => 'select',
+            'choices' => $source_choices,
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_density',
+        array(
+            'default'           => 'cozy',
+            'sanitize_callback' => 'nest_well_discovery_sanitize_density',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_density',
+        array(
+            'label'   => esc_html__( 'Card density', 'nest-and-well' ),
+            'section' => 'nest_well_homepage',
+            'type'    => 'radio',
+            'choices' => array(
+                'cozy'  => esc_html__( 'Cozy (3 columns)', 'nest-and-well' ),
+                'dense' => esc_html__( 'Dense (4 columns)', 'nest-and-well' ),
+                'tight' => esc_html__( 'Tight (5 columns)', 'nest-and-well' ),
+            ),
+        )
+    );
+
+    $wp_customize->add_setting(
+        'nest_well_discovery_per_page',
+        array(
+            'default'           => 18,
+            'sanitize_callback' => 'nest_well_discovery_sanitize_per_page',
+        )
+    );
+    $wp_customize->add_control(
+        'nest_well_discovery_per_page',
+        array(
+            'label'   => esc_html__( 'Posts per scroll fetch', 'nest-and-well' ),
+            'section' => 'nest_well_homepage',
+            'type'    => 'select',
+            'choices' => array(
+                12 => '12',
+                18 => '18',
+                24 => '24',
+                36 => '36',
+            ),
+        )
+    );
+
     // =========================================================
     // SECTION: Email Capture (MailerLite)
     // =========================================================

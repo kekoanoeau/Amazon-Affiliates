@@ -85,6 +85,8 @@ $total_pages = (int) $home_query->max_num_pages;
 
 	</div><!-- .hp-feed -->
 
+	<?php get_template_part( 'template-parts/discovery-feed' ); ?>
+
 </main><!-- #main -->
 
 <?php get_footer(); ?>

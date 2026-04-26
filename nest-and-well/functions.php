@@ -25,6 +25,7 @@ require_once NEST_WELL_DIR . '/inc/email-capture.php';
 require_once NEST_WELL_DIR . '/inc/user-accounts.php';
 require_once NEST_WELL_DIR . '/inc/faq-meta.php';
 require_once NEST_WELL_DIR . '/inc/review-meta.php';
+require_once NEST_WELL_DIR . '/inc/discovery-feed.php';
 
 /**
  * Enqueue theme scripts and styles.
@@ -72,6 +73,15 @@ function nest_well_enqueue_assets() {
         true
     );
 
+    // Discovery Feed JavaScript — IntersectionObserver for masonry infinite scroll
+    wp_enqueue_script(
+        'nest-well-discovery',
+        NEST_WELL_URI . '/assets/js/discovery.js',
+        array( 'nest-well-main' ),
+        NEST_WELL_VERSION,
+        true
+    );
+
     // Pass data to JS
     wp_localize_script(
         'nest-well-main',
@@ -109,7 +119,7 @@ add_action( 'enqueue_block_editor_assets', 'nest_well_enqueue_editor_assets' );
  * Add defer attribute to non-critical scripts.
  */
 function nest_well_defer_scripts( $tag, $handle, $src ) {
-    $defer_scripts = array( 'nest-well-main', 'nest-well-affiliate' );
+    $defer_scripts = array( 'nest-well-main', 'nest-well-affiliate', 'nest-well-discovery' );
 
     if ( in_array( $handle, $defer_scripts, true ) ) {
         return str_replace( ' src=', ' defer src=', $tag );
