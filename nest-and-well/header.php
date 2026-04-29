@@ -68,18 +68,6 @@
                         </span>
                         <?php endif; ?>
                     </a>
-                    <?php if ( is_front_page() ) : ?>
-                    <span class="wordmark__tagline">
-                        <?php
-                        echo esc_html(
-                            get_theme_mod(
-                                'nest_well_brand_tagline',
-                                __( 'Shop Smarter. Live Better.', 'nest-and-well' )
-                            )
-                        );
-                        ?>
-                    </span>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Primary nav (desktop) -->
