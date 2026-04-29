@@ -45,16 +45,16 @@ get_header();
             <div class="byline" aria-label="<?php esc_attr_e( 'Article information', 'nest-and-well' ); ?>">
                 <div class="byline__author">
                     <?php if ( $author_avatar ) : ?>
-                    <a href="<?php echo esc_url( $author_url ); ?>" class="byline__avatar-link">
+                    <div class="byline__avatar-link">
                         <?php echo $author_avatar; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                    </a>
+                    </div>
                     <?php endif; ?>
                     <div class="byline__meta">
                         <span class="byline__by-line">
                             <?php esc_html_e( 'By', 'nest-and-well' ); ?>
-                            <a href="<?php echo esc_url( $author_url ); ?>" class="byline__author-name">
+                            <span class="byline__author-name">
                                 <?php echo esc_html( $author_name ); ?>
-                            </a>
+                            </span>
                         </span>
                         <span class="byline__dates">
                             <time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>" class="byline__published">
