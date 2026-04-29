@@ -28,6 +28,8 @@ $total_pages = (int) $home_query->max_num_pages;
 
 	<?php get_template_part( 'template-parts/hero' ); ?>
 
+	<?php get_template_part( 'template-parts/deals-feed' ); ?>
+
 	<div class="hp-feed container">
 
 		<header class="hp-feed__header">
