@@ -226,6 +226,179 @@ function nest_well_logout_redirect() {
 add_filter( 'logout_redirect', 'nest_well_logout_redirect' );
 
 // ============================================================
+// PASSWORD RESET — REQUEST EMAIL
+// ============================================================
+
+/**
+ * Handle "forgot password" form submission.
+ * Sends a reset email via WP's built-in retrieve_password() flow,
+ * which respects any SMTP plugin already wired into wp_mail().
+ *
+ * Privacy: returns true even when the email is unknown so the
+ * response cannot be used to enumerate accounts. Real errors are
+ * written to the PHP error log for ops debugging.
+ *
+ * @return WP_Error|true
+ */
+function nest_well_handle_password_reset_request() {
+    if (
+        ! isset( $_POST['nest_well_reset_request_nonce'] ) ||
+        ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nest_well_reset_request_nonce'] ) ), 'nest_well_reset_request' )
+    ) {
+        return new WP_Error( 'invalid_nonce', esc_html__( 'Security check failed.', 'nest-and-well' ) );
+    }
+
+    $login = sanitize_text_field( wp_unslash( $_POST['user_login'] ?? '' ) );
+    if ( empty( $login ) ) {
+        return new WP_Error( 'empty_login', esc_html__( 'Please enter your username or email.', 'nest-and-well' ) );
+    }
+
+    $user = is_email( $login ) ? get_user_by( 'email', $login ) : get_user_by( 'login', $login );
+
+    if ( $user instanceof WP_User ) {
+        $result = retrieve_password( $user->user_login );
+        if ( is_wp_error( $result ) ) {
+            error_log( 'nest_well_handle_password_reset_request: ' . $result->get_error_message() );
+        }
+    }
+
+    // Always succeed from the user's POV — never leak account existence.
+    return true;
+}
+
+// ============================================================
+// PASSWORD RESET — APPLY NEW PASSWORD
+// ============================================================
+
+/**
+ * Handle the new-password form on /account/?action=reset&key=...&login=...
+ * Validates the WP reset key and writes the new password.
+ *
+ * @return WP_Error|true
+ */
+function nest_well_handle_password_reset() {
+    if (
+        ! isset( $_POST['nest_well_reset_nonce'] ) ||
+        ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nest_well_reset_nonce'] ) ), 'nest_well_reset' )
+    ) {
+        return new WP_Error( 'invalid_nonce', esc_html__( 'Security check failed.', 'nest-and-well' ) );
+    }
+
+    $key   = sanitize_text_field( wp_unslash( $_POST['key'] ?? '' ) );
+    $login = sanitize_text_field( wp_unslash( $_POST['login'] ?? '' ) );
+    $pass  = wp_unslash( $_POST['new_password'] ?? '' );
+    $pass2 = wp_unslash( $_POST['new_password_confirm'] ?? '' );
+
+    if ( empty( $key ) || empty( $login ) ) {
+        return new WP_Error( 'invalid_link', esc_html__( 'This password reset link is invalid or has expired. Please request a new one.', 'nest-and-well' ) );
+    }
+
+    if ( empty( $pass ) ) {
+        return new WP_Error( 'empty_password', esc_html__( 'Please enter a new password.', 'nest-and-well' ) );
+    }
+
+    if ( $pass !== $pass2 ) {
+        return new WP_Error( 'password_mismatch', esc_html__( 'Passwords do not match.', 'nest-and-well' ) );
+    }
+
+    if ( strlen( $pass ) < 8 ) {
+        return new WP_Error( 'password_short', esc_html__( 'Password must be at least 8 characters.', 'nest-and-well' ) );
+    }
+
+    $user = check_password_reset_key( $key, $login );
+    if ( is_wp_error( $user ) ) {
+        return new WP_Error( 'invalid_link', esc_html__( 'This password reset link is invalid or has expired. Please request a new one.', 'nest-and-well' ) );
+    }
+
+    reset_password( $user, $pass );
+
+    return true;
+}
+
+// ============================================================
+// PROFILE UPDATE — DISPLAY NAME / EMAIL / PASSWORD
+// ============================================================
+
+/**
+ * Handle the logged-in user's profile-edit form.
+ * Splits into two sub-forms via a `change_password` flag so a
+ * single nonce/handler can serve both identity edits and password
+ * change. Either sub-form requires the user's current password.
+ *
+ * @return WP_Error|true
+ */
+function nest_well_handle_profile_update() {
+    if ( ! is_user_logged_in() ) {
+        return new WP_Error( 'not_logged_in', esc_html__( 'You must be logged in.', 'nest-and-well' ) );
+    }
+
+    if (
+        ! isset( $_POST['nest_well_profile_nonce'] ) ||
+        ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nest_well_profile_nonce'] ) ), 'nest_well_profile' )
+    ) {
+        return new WP_Error( 'invalid_nonce', esc_html__( 'Security check failed.', 'nest-and-well' ) );
+    }
+
+    $current_user    = wp_get_current_user();
+    $is_password_form = ! empty( $_POST['change_password'] );
+
+    $current_password = wp_unslash( $_POST['current_password'] ?? '' );
+    if ( empty( $current_password ) || ! wp_check_password( $current_password, $current_user->user_pass, $current_user->ID ) ) {
+        return new WP_Error( 'wrong_password', esc_html__( 'Current password is incorrect.', 'nest-and-well' ) );
+    }
+
+    if ( $is_password_form ) {
+        $new_pass  = wp_unslash( $_POST['new_password'] ?? '' );
+        $new_pass2 = wp_unslash( $_POST['new_password_confirm'] ?? '' );
+
+        if ( empty( $new_pass ) ) {
+            return new WP_Error( 'empty_password', esc_html__( 'Please enter a new password.', 'nest-and-well' ) );
+        }
+        if ( $new_pass !== $new_pass2 ) {
+            return new WP_Error( 'password_mismatch', esc_html__( 'New passwords do not match.', 'nest-and-well' ) );
+        }
+        if ( strlen( $new_pass ) < 8 ) {
+            return new WP_Error( 'password_short', esc_html__( 'Password must be at least 8 characters.', 'nest-and-well' ) );
+        }
+
+        wp_set_password( $new_pass, $current_user->ID );
+        // wp_set_password destroys the session — restore it.
+        wp_set_auth_cookie( $current_user->ID, true );
+        return 'password_updated';
+    }
+
+    // Identity form
+    $display_name = sanitize_text_field( wp_unslash( $_POST['display_name'] ?? '' ) );
+    $new_email    = sanitize_email( wp_unslash( $_POST['user_email'] ?? '' ) );
+
+    if ( empty( $display_name ) ) {
+        return new WP_Error( 'empty_name', esc_html__( 'Display name cannot be empty.', 'nest-and-well' ) );
+    }
+    if ( empty( $new_email ) || ! is_email( $new_email ) ) {
+        return new WP_Error( 'invalid_email', esc_html__( 'Please enter a valid email address.', 'nest-and-well' ) );
+    }
+
+    if ( $new_email !== $current_user->user_email ) {
+        $existing = email_exists( $new_email );
+        if ( $existing && (int) $existing !== (int) $current_user->ID ) {
+            return new WP_Error( 'email_taken', esc_html__( 'That email is already in use by another account.', 'nest-and-well' ) );
+        }
+    }
+
+    $update = wp_update_user( array(
+        'ID'           => $current_user->ID,
+        'display_name' => $display_name,
+        'user_email'   => $new_email,
+    ) );
+
+    if ( is_wp_error( $update ) ) {
+        return $update;
+    }
+
+    return 'profile_updated';
+}
+
+// ============================================================
 // REDIRECT LOGGED-IN USERS AWAY FROM WP-LOGIN
 // ============================================================
 

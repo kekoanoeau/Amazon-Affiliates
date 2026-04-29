@@ -5065,3 +5065,106 @@ select:focus-visible {
     .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 1; }
 }
 
+/* ============================================================
+   35. ACCOUNT — HEADER AVATAR + PROFILE EDIT CARD
+   ============================================================ */
+
+/* Header avatar replaces the generic SVG when the user is logged in */
+.site-header__account-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Sage dot badge so users without a Gravatar still see a logged-in cue */
+.site-header__account-link--active { position: relative; }
+.site-header__account-link--active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+    border: 2px solid var(--warm-white);
+    box-sizing: content-box;
+}
+[data-theme="dark"] .site-header__account-link--active::after {
+    border-color: var(--lt-stone);
+}
+
+/* Profile-edit card — collapsible <details> wrapper */
+.account-edit {
+    background: var(--white);
+    border: 1px solid var(--lt-stone);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2xl);
+    overflow: hidden;
+}
+.account-edit__summary {
+    cursor: pointer;
+    padding: var(--space-md) var(--space-lg);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--forest);
+    list-style: none;
+    user-select: none;
+    transition: background var(--transition-fast);
+}
+.account-edit__summary::-webkit-details-marker { display: none; }
+.account-edit__summary::after {
+    content: '+';
+    float: right;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--sage);
+    transition: transform var(--transition-fast);
+}
+.account-edit[open] .account-edit__summary::after { content: '\2212'; }
+.account-edit__summary:hover { background: var(--lt-stone); }
+
+.account-edit__panels {
+    padding: var(--space-lg);
+    border-top: 1px solid var(--lt-stone);
+    display: grid;
+    gap: var(--space-2xl);
+}
+
+.account-edit__form { margin: 0; }
+.account-edit__heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--forest);
+    margin: 0 0 var(--space-md);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--lt-stone);
+}
+
+/* Two-column row for display_name + email and new/confirm passwords */
+.account-edit__row {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+}
+@media (min-width: 600px) {
+    .account-edit__row--two-col { grid-template-columns: 1fr 1fr; }
+}
+.account-edit__row .account-form__field { margin-bottom: 0; }
+
+.account-edit__submit { width: auto; min-width: 180px; }
+
+/* 3-tab account layout: keep readable on small screens */
+@media (max-width: 480px) {
+    .account-tabs__nav { flex-wrap: wrap; }
+    .account-tabs__tab { padding: var(--space-sm) var(--space-md); font-size: 14px; }
+}
+
+/* Reset-password standalone view spacing parity with login form */
+.account-form-wrap {
+    max-width: 440px;
+    margin: 0 auto;
+}
+

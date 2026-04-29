@@ -29,12 +29,38 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
             wp_safe_redirect( $redirect );
             exit;
         }
+    } elseif ( isset( $_POST['nest_well_reset_request_nonce'] ) ) {
+        $action_result = nest_well_handle_password_reset_request();
+        if ( true === $action_result ) {
+            wp_safe_redirect( home_url( '/account/?reset_sent=1' ) );
+            exit;
+        }
+    } elseif ( isset( $_POST['nest_well_reset_nonce'] ) ) {
+        $action_result = nest_well_handle_password_reset();
+        if ( true === $action_result ) {
+            wp_safe_redirect( home_url( '/account/?reset=1' ) );
+            exit;
+        }
+    } elseif ( isset( $_POST['nest_well_profile_nonce'] ) ) {
+        $action_result = nest_well_handle_profile_update();
+        if ( 'profile_updated' === $action_result ) {
+            wp_safe_redirect( home_url( '/account/?profile_updated=1' ) );
+            exit;
+        }
+        if ( 'password_updated' === $action_result ) {
+            wp_safe_redirect( home_url( '/account/?password_updated=1' ) );
+            exit;
+        }
     }
 }
 
 get_header();
 
-$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
+$tab           = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
+$action        = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : '';
+$reset_key     = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
+$reset_login   = isset( $_GET['login'] ) ? sanitize_text_field( wp_unslash( $_GET['login'] ) ) : '';
+$is_reset_view = ( 'reset' === $action && $reset_key && $reset_login );
 ?>
 
 <main id="content" class="site-content account-page">
@@ -49,6 +75,25 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
     <!-- ============================================================
          LOGGED-IN VIEW
          ============================================================ -->
+
+    <?php if ( isset( $_GET['profile_updated'] ) ) : ?>
+    <div class="account-notice account-notice--success" role="status">
+        <?php esc_html_e( 'Profile updated.', 'nest-and-well' ); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ( isset( $_GET['password_updated'] ) ) : ?>
+    <div class="account-notice account-notice--success" role="status">
+        <?php esc_html_e( 'Password updated.', 'nest-and-well' ); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ( is_wp_error( $action_result ) ) : ?>
+    <div class="account-notice account-notice--error" role="status">
+        <?php echo esc_html( $action_result->get_error_message() ); ?>
+    </div>
+    <?php endif; ?>
+
     <div class="account-profile">
 
         <div class="account-profile__header">
@@ -74,6 +119,123 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
                 <span class="account-stat__label"><?php echo esc_html( _n( 'Saved Article', 'Saved Articles', $saved_count, 'nest-and-well' ) ); ?></span>
             </div>
         </div>
+
+        <!-- Profile Settings -->
+        <details class="account-edit" id="profile-settings">
+            <summary class="account-edit__summary">
+                <?php esc_html_e( 'Profile Settings', 'nest-and-well' ); ?>
+            </summary>
+
+            <div class="account-edit__panels">
+
+                <!-- Identity sub-form -->
+                <form class="account-form account-edit__form" method="post" action="<?php echo esc_url( get_permalink() ); ?>" novalidate>
+                    <?php wp_nonce_field( 'nest_well_profile', 'nest_well_profile_nonce' ); ?>
+
+                    <h3 class="account-edit__heading"><?php esc_html_e( 'Identity', 'nest-and-well' ); ?></h3>
+
+                    <div class="account-edit__row account-edit__row--two-col">
+                        <div class="account-form__field">
+                            <label class="account-form__label" for="display_name">
+                                <?php esc_html_e( 'Display Name', 'nest-and-well' ); ?>
+                            </label>
+                            <input class="account-form__input"
+                                   type="text"
+                                   id="display_name"
+                                   name="display_name"
+                                   value="<?php echo esc_attr( $current_user->display_name ); ?>"
+                                   autocomplete="name"
+                                   required>
+                        </div>
+
+                        <div class="account-form__field">
+                            <label class="account-form__label" for="user_email">
+                                <?php esc_html_e( 'Email', 'nest-and-well' ); ?>
+                            </label>
+                            <input class="account-form__input"
+                                   type="email"
+                                   id="user_email"
+                                   name="user_email"
+                                   value="<?php echo esc_attr( $current_user->user_email ); ?>"
+                                   autocomplete="email"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="account-form__field">
+                        <label class="account-form__label" for="current_password_identity">
+                            <?php esc_html_e( 'Current Password', 'nest-and-well' ); ?>
+                            <span class="account-form__required" aria-hidden="true">*</span>
+                        </label>
+                        <input class="account-form__input"
+                               type="password"
+                               id="current_password_identity"
+                               name="current_password"
+                               autocomplete="current-password"
+                               required>
+                        <span class="account-form__hint"><?php esc_html_e( 'Required to confirm changes.', 'nest-and-well' ); ?></span>
+                    </div>
+
+                    <button type="submit" class="btn btn--sage account-edit__submit">
+                        <?php esc_html_e( 'Save changes', 'nest-and-well' ); ?>
+                    </button>
+                </form>
+
+                <!-- Change-password sub-form -->
+                <form class="account-form account-edit__form" method="post" action="<?php echo esc_url( get_permalink() ); ?>" novalidate>
+                    <?php wp_nonce_field( 'nest_well_profile', 'nest_well_profile_nonce' ); ?>
+                    <input type="hidden" name="change_password" value="1">
+
+                    <h3 class="account-edit__heading"><?php esc_html_e( 'Change Password', 'nest-and-well' ); ?></h3>
+
+                    <div class="account-form__field">
+                        <label class="account-form__label" for="current_password_pw">
+                            <?php esc_html_e( 'Current Password', 'nest-and-well' ); ?>
+                        </label>
+                        <input class="account-form__input"
+                               type="password"
+                               id="current_password_pw"
+                               name="current_password"
+                               autocomplete="current-password"
+                               required>
+                    </div>
+
+                    <div class="account-edit__row account-edit__row--two-col">
+                        <div class="account-form__field">
+                            <label class="account-form__label" for="new_password">
+                                <?php esc_html_e( 'New Password', 'nest-and-well' ); ?>
+                            </label>
+                            <input class="account-form__input"
+                                   type="password"
+                                   id="new_password"
+                                   name="new_password"
+                                   autocomplete="new-password"
+                                   minlength="8"
+                                   required>
+                            <span class="account-form__hint"><?php esc_html_e( 'Minimum 8 characters', 'nest-and-well' ); ?></span>
+                        </div>
+
+                        <div class="account-form__field">
+                            <label class="account-form__label" for="new_password_confirm">
+                                <?php esc_html_e( 'Confirm New Password', 'nest-and-well' ); ?>
+                            </label>
+                            <input class="account-form__input"
+                                   type="password"
+                                   id="new_password_confirm"
+                                   name="new_password_confirm"
+                                   autocomplete="new-password"
+                                   minlength="8"
+                                   required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn--sage-outline account-edit__submit">
+                        <?php esc_html_e( 'Update password', 'nest-and-well' ); ?>
+                    </button>
+                </form>
+
+            </div><!-- .account-edit__panels -->
+        </details><!-- #profile-settings -->
 
         <!-- Saved Articles List -->
         <div class="account-saved">
@@ -152,28 +314,97 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
          ============================================================ -->
 
     <?php if ( isset( $_GET['logged_out'] ) ) : ?>
-    <div class="account-notice account-notice--info">
+    <div class="account-notice account-notice--info" role="status">
         <?php esc_html_e( 'You have been logged out.', 'nest-and-well' ); ?>
     </div>
     <?php endif; ?>
 
     <?php if ( isset( $_GET['registered'] ) ) : ?>
-    <div class="account-notice account-notice--success">
+    <div class="account-notice account-notice--success" role="status">
         <?php esc_html_e( 'Account created! You are now logged in.', 'nest-and-well' ); ?>
     </div>
     <?php endif; ?>
 
+    <?php if ( isset( $_GET['reset_sent'] ) ) : ?>
+    <div class="account-notice account-notice--success" role="status">
+        <?php esc_html_e( 'If an account matches that email, a password reset link is on its way. Check your inbox.', 'nest-and-well' ); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ( isset( $_GET['reset'] ) ) : ?>
+    <div class="account-notice account-notice--success" role="status">
+        <?php esc_html_e( 'Password updated. You can now sign in with your new password.', 'nest-and-well' ); ?>
+    </div>
+    <?php endif; ?>
+
     <?php if ( is_wp_error( $action_result ) ) : ?>
-    <div class="account-notice account-notice--error">
+    <div class="account-notice account-notice--error" role="status">
         <?php echo esc_html( $action_result->get_error_message() ); ?>
     </div>
     <?php endif; ?>
 
+    <?php if ( $is_reset_view ) : ?>
+
+    <!-- ============================================================
+         RESET PASSWORD VIEW (no tabs — focused single form)
+         ============================================================ -->
+    <div class="account-form-wrap">
+        <h1 class="account-form__heading"><?php esc_html_e( 'Choose a new password', 'nest-and-well' ); ?></h1>
+        <p class="account-form__subheading"><?php esc_html_e( 'Enter and confirm your new password below.', 'nest-and-well' ); ?></p>
+
+        <form class="account-form" method="post" action="<?php echo esc_url( get_permalink() ); ?>" novalidate>
+            <?php wp_nonce_field( 'nest_well_reset', 'nest_well_reset_nonce' ); ?>
+            <input type="hidden" name="key" value="<?php echo esc_attr( $reset_key ); ?>">
+            <input type="hidden" name="login" value="<?php echo esc_attr( $reset_login ); ?>">
+
+            <div class="account-form__field">
+                <label class="account-form__label" for="reset_new_password">
+                    <?php esc_html_e( 'New Password', 'nest-and-well' ); ?>
+                    <span class="account-form__required" aria-hidden="true">*</span>
+                </label>
+                <input class="account-form__input"
+                       type="password"
+                       id="reset_new_password"
+                       name="new_password"
+                       autocomplete="new-password"
+                       minlength="8"
+                       required>
+                <span class="account-form__hint"><?php esc_html_e( 'Minimum 8 characters', 'nest-and-well' ); ?></span>
+            </div>
+
+            <div class="account-form__field">
+                <label class="account-form__label" for="reset_new_password_confirm">
+                    <?php esc_html_e( 'Confirm New Password', 'nest-and-well' ); ?>
+                    <span class="account-form__required" aria-hidden="true">*</span>
+                </label>
+                <input class="account-form__input"
+                       type="password"
+                       id="reset_new_password_confirm"
+                       name="new_password_confirm"
+                       autocomplete="new-password"
+                       minlength="8"
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn--primary account-form__submit">
+                <?php esc_html_e( 'Reset password', 'nest-and-well' ); ?>
+            </button>
+
+            <p class="account-form__switch">
+                <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>" class="account-tabs__switch-link">
+                    <?php esc_html_e( 'Back to login', 'nest-and-well' ); ?>
+                </a>
+            </p>
+        </form>
+    </div>
+
+    <?php else : ?>
+
     <div class="account-tabs">
         <div class="account-tabs__nav" role="tablist" aria-label="<?php esc_attr_e( 'Account options', 'nest-and-well' ); ?>">
-            <button class="account-tabs__tab <?php echo 'register' !== $tab ? 'is-active' : ''; ?>"
+            <button class="account-tabs__tab <?php echo ( 'register' !== $tab && 'forgot' !== $tab ) ? 'is-active' : ''; ?>"
                     role="tab"
-                    aria-selected="<?php echo 'register' !== $tab ? 'true' : 'false'; ?>"
+                    aria-selected="<?php echo ( 'register' !== $tab && 'forgot' !== $tab ) ? 'true' : 'false'; ?>"
                     aria-controls="tab-login"
                     id="tab-btn-login"
                     data-tab="login">
@@ -187,14 +418,22 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
                     data-tab="register">
                 <?php esc_html_e( 'Create Account', 'nest-and-well' ); ?>
             </button>
+            <button class="account-tabs__tab <?php echo 'forgot' === $tab ? 'is-active' : ''; ?>"
+                    role="tab"
+                    aria-selected="<?php echo 'forgot' === $tab ? 'true' : 'false'; ?>"
+                    aria-controls="tab-forgot"
+                    id="tab-btn-forgot"
+                    data-tab="forgot">
+                <?php esc_html_e( 'Forgot Password', 'nest-and-well' ); ?>
+            </button>
         </div>
 
         <!-- LOGIN PANEL -->
-        <div class="account-tabs__panel <?php echo 'register' !== $tab ? 'is-active' : ''; ?>"
+        <div class="account-tabs__panel <?php echo ( 'register' !== $tab && 'forgot' !== $tab ) ? 'is-active' : ''; ?>"
              id="tab-login"
              role="tabpanel"
              aria-labelledby="tab-btn-login"
-             <?php echo 'register' === $tab ? 'hidden' : ''; ?>>
+             <?php echo ( 'register' === $tab || 'forgot' === $tab ) ? 'hidden' : ''; ?>>
 
             <h1 class="account-form__heading"><?php esc_html_e( 'Welcome Back', 'nest-and-well' ); ?></h1>
             <p class="account-form__subheading"><?php esc_html_e( 'Log in to access your saved articles.', 'nest-and-well' ); ?></p>
@@ -237,6 +476,12 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
                 <button type="submit" class="btn btn--primary account-form__submit">
                     <?php esc_html_e( 'Log In', 'nest-and-well' ); ?>
                 </button>
+
+                <p class="account-form__switch">
+                    <a href="<?php echo esc_url( add_query_arg( 'tab', 'forgot', get_permalink() ) ); ?>" class="account-tabs__switch-link" data-tab="forgot">
+                        <?php esc_html_e( 'Forgot your password?', 'nest-and-well' ); ?>
+                    </a>
+                </p>
 
                 <p class="account-form__switch">
                     <?php esc_html_e( "Don't have an account?", 'nest-and-well' ); ?>
@@ -336,7 +581,46 @@ $tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'login';
             <?php endif; ?>
         </div><!-- #tab-register -->
 
+        <!-- FORGOT PANEL -->
+        <div class="account-tabs__panel <?php echo 'forgot' === $tab ? 'is-active' : ''; ?>"
+             id="tab-forgot"
+             role="tabpanel"
+             aria-labelledby="tab-btn-forgot"
+             <?php echo 'forgot' !== $tab ? 'hidden' : ''; ?>>
+
+            <h1 class="account-form__heading"><?php esc_html_e( 'Reset your password', 'nest-and-well' ); ?></h1>
+            <p class="account-form__subheading"><?php esc_html_e( "Enter your username or email and we'll send you a reset link.", 'nest-and-well' ); ?></p>
+
+            <form class="account-form" method="post" action="<?php echo esc_url( add_query_arg( 'tab', 'forgot', get_permalink() ) ); ?>" novalidate>
+                <?php wp_nonce_field( 'nest_well_reset_request', 'nest_well_reset_request_nonce' ); ?>
+
+                <div class="account-form__field">
+                    <label class="account-form__label" for="forgot_user_login">
+                        <?php esc_html_e( 'Username or Email', 'nest-and-well' ); ?>
+                    </label>
+                    <input class="account-form__input"
+                           type="text"
+                           id="forgot_user_login"
+                           name="user_login"
+                           autocomplete="username"
+                           required>
+                </div>
+
+                <button type="submit" class="btn btn--primary account-form__submit">
+                    <?php esc_html_e( 'Send reset link', 'nest-and-well' ); ?>
+                </button>
+
+                <p class="account-form__switch">
+                    <a href="<?php echo esc_url( get_permalink() ); ?>" class="account-tabs__switch-link" data-tab="login">
+                        <?php esc_html_e( 'Back to login', 'nest-and-well' ); ?>
+                    </a>
+                </p>
+            </form>
+        </div><!-- #tab-forgot -->
+
     </div><!-- .account-tabs -->
+
+    <?php endif; // $is_reset_view ?>
 
 <?php endif; // is_user_logged_in() ?>
 

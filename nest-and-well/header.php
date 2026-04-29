@@ -141,11 +141,26 @@
                     </button>
 
                     <!-- Account -->
-                    <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>" class="site-header__account-link" aria-label="<?php esc_attr_e( 'Account', 'nest-and-well' ); ?>">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                    <?php $nw_logged_in = is_user_logged_in(); ?>
+                    <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>"
+                       class="site-header__account-link <?php echo $nw_logged_in ? 'site-header__account-link--active' : ''; ?>"
+                       aria-label="<?php echo esc_attr( $nw_logged_in ? __( 'Your account', 'nest-and-well' ) : __( 'Sign in', 'nest-and-well' ) ); ?>">
+                        <?php if ( $nw_logged_in ) : ?>
+                            <?php
+                            echo get_avatar(
+                                get_current_user_id(),
+                                28,
+                                '',
+                                '',
+                                array( 'class' => 'site-header__account-avatar' )
+                            ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            ?>
+                        <?php else : ?>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        <?php endif; ?>
                     </a>
 
                 </div><!-- .site-header__actions -->
