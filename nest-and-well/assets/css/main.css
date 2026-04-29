@@ -1376,7 +1376,10 @@ select:focus-visible {
 .article-grid {
     display: grid;
     gap: var(--space-lg);
+    width: 100%;
 }
+/* Prevent grid items from overflowing their track (important in flex parents) */
+.article-grid > * { min-width: 0; }
 .article-grid--3col { grid-template-columns: repeat(3, 1fr); }
 .article-grid--2col { grid-template-columns: repeat(2, 1fr); }
 
@@ -3183,8 +3186,10 @@ select:focus-visible {
 .author-bio__link:hover { color: var(--forest); }
 
 /* Related posts */
-.related-posts { margin-top: var(--space-2xl); }
+.related-posts { margin-top: var(--space-2xl); overflow: hidden; }
 .related-posts__heading { font-size: 22px; margin-bottom: var(--space-lg); padding-bottom: var(--space-sm); border-bottom: 2px solid var(--lt-stone); }
+/* 2 columns in the narrow single-post content column; 3 columns on homepage-width grids */
+.related-posts .article-grid--3col { grid-template-columns: repeat(2, 1fr); }
 
 /* ============================================================
    24. SAVE ARTICLE BUTTON
