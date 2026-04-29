@@ -4312,6 +4312,49 @@ select:focus-visible {
 [data-theme="dark"] .footer-legal__links a:hover { color: var(--charcoal); }
 
 /* ============================================================
+   Dark mode — Gutenberg / page-content background overrides
+
+   Static pages (Privacy, Terms, Affiliate Disclosure, etc.) are
+   built with Gutenberg blocks whose background colours get baked
+   into inline styles (style="background-color:#F5F2EE"). Those
+   values don't follow the CSS-variable theme flip, so in dark
+   mode the page surface stays light-cream while text colours
+   correctly switch to light — producing unreadable cream-on-cream
+   sections. Override the common warm-cream surfaces with the
+   dark-mode --lt-stone token so the page becomes readable.
+   ============================================================ */
+
+[data-theme="dark"] .entry-content .wp-block-cover,
+[data-theme="dark"] .entry-content .wp-block-cover__background,
+[data-theme="dark"] .entry-content .wp-block-group.has-background,
+[data-theme="dark"] .entry-content .wp-block-column.has-background,
+[data-theme="dark"] .entry-content .has-background.has-warm-white-background-color,
+[data-theme="dark"] .entry-content [style*="background-color: #F5F2EE" i],
+[data-theme="dark"] .entry-content [style*="background-color:#F5F2EE" i],
+[data-theme="dark"] .entry-content [style*="background-color: #EDE8E0" i],
+[data-theme="dark"] .entry-content [style*="background-color:#EDE8E0" i],
+[data-theme="dark"] .entry-content [style*="background-color: #FFF" i],
+[data-theme="dark"] .entry-content [style*="background-color:#FFF" i],
+[data-theme="dark"] .entry-content [style*="background-color: #fff" i],
+[data-theme="dark"] .entry-content [style*="background-color:#fff" i],
+[data-theme="dark"] .entry-content [style*="background:#F5F2EE" i],
+[data-theme="dark"] .entry-content [style*="background: #F5F2EE" i],
+[data-theme="dark"] .entry-content [style*="background:#EDE8E0" i],
+[data-theme="dark"] .entry-content [style*="background: #EDE8E0" i] {
+    background-color: var(--lt-stone) !important;
+    color: var(--charcoal);
+}
+
+/* Same problem for raw text colors set inline — dark charcoal on dark surface
+   becomes invisible, so flip them to the light dark-mode charcoal token. */
+[data-theme="dark"] .entry-content [style*="color: #2C2C2C" i],
+[data-theme="dark"] .entry-content [style*="color:#2C2C2C" i],
+[data-theme="dark"] .entry-content [style*="color: #1A3C34" i],
+[data-theme="dark"] .entry-content [style*="color:#1A3C34" i] {
+    color: var(--charcoal) !important;
+}
+
+/* ============================================================
    29. TABLE OF CONTENTS
    ============================================================ */
 .toc {
