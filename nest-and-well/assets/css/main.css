@@ -1963,11 +1963,9 @@ select:focus-visible {
 
 @media (max-width: 767px) {
     .bottom-tabs { display: flex; }
-    /* Lift the page so the fixed back-to-top + bar don't cover content. */
+    /* Lift the page so the fixed bottom-tabs bar doesn't cover content. */
     body { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)); }
-    .back-to-top {
-        bottom: calc(72px + env(safe-area-inset-bottom, 0));
-    }
+    /* (back-to-top is lifted further down, after its base definition) */
     .sticky-buy-bar {
         bottom: calc(64px + env(safe-area-inset-bottom, 0));
     }
@@ -4296,6 +4294,22 @@ select:focus-visible {
 }
 .back-to-top.is-visible { opacity: 1; visibility: visible; }
 .back-to-top:hover { background: var(--sage); }
+
+/* Mobile: lift above the fixed bottom-tabs nav (z-index 95) and sit on top of it */
+@media (max-width: 767px) {
+    .back-to-top {
+        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        z-index: 100;
+    }
+}
+
+/* Dark mode: --forest flips to a light tone, so the legal bar background
+   needs an explicit dark surface to keep the moss text readable. */
+[data-theme="dark"] .footer-legal {
+    background: var(--warm-white);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .footer-legal__links a:hover { color: var(--charcoal); }
 
 /* ============================================================
    29. TABLE OF CONTENTS
