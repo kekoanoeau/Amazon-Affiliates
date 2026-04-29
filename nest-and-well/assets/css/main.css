@@ -716,7 +716,7 @@ select:focus-visible {
     text-decoration: none;
     color: var(--forest);
     font-family: var(--font-display);
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1;
@@ -727,7 +727,7 @@ select:focus-visible {
     font-weight: 400;
     color: var(--sage);
 }
-.wordmark__logo-img { height: 36px; width: auto; }
+.wordmark__logo-img { height: 56px; width: auto; }
 
 .wordmark__tagline {
     display: block;
@@ -4470,7 +4470,8 @@ select:focus-visible {
     .home-hero__ctas { flex-direction: column; }
     .home-hero__ctas .btn { text-align: center; }
 
-    .wordmark { font-size: 22px; }
+    .wordmark { font-size: 28px; }
+    .wordmark__logo-img { height: 44px; }
     .wordmark__tagline { display: none; }
     .category-strip__list { justify-content: flex-start; gap: var(--space-lg); padding-left: var(--space-md); padding-right: var(--space-md); }
 

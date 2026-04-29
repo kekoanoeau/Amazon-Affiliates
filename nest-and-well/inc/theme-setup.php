@@ -40,8 +40,8 @@ function nest_well_setup() {
     add_theme_support(
         'custom-logo',
         array(
-            'height'      => 60,
-            'width'       => 200,
+            'height'      => 90,
+            'width'       => 280,
             'flex-height' => true,
             'flex-width'  => true,
             'header-text' => array( 'site-title', 'site-description' ),
