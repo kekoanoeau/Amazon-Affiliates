@@ -11,7 +11,6 @@ defined( 'ABSPATH' ) || exit;
 
 $author_id     = get_post_field( 'post_author', get_the_ID() );
 $author_name   = get_the_author_meta( 'display_name', $author_id );
-$author_bio    = get_the_author_meta( 'description', $author_id );
 $author_url    = get_author_posts_url( $author_id );
 $author_site   = get_the_author_meta( 'user_url', $author_id );
 $author_twitter = get_the_author_meta( 'twitter', $author_id );
@@ -61,12 +60,6 @@ if ( ! $author_name ) {
                 <p class="author-bio__title" itemprop="jobTitle"><?php echo esc_html( $author_title ); ?></p>
                 <?php endif; ?>
             </div>
-
-            <?php if ( $author_bio ) : ?>
-            <p class="author-bio__description" itemprop="description">
-                <?php echo wp_kses_post( $author_bio ); ?>
-            </p>
-            <?php endif; ?>
 
             <!-- Author Social Links -->
             <div class="author-bio__links">
