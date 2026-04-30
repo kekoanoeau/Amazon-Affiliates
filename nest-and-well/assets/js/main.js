@@ -898,13 +898,12 @@
     var forms = $$('.js-subscribe-form');
     if (!forms.length) return;
 
-    if (typeof window.nestWellSubscribe === 'undefined') {
-      // Without the localized nonce/endpoint we can't bind. Forms will fall
-      // back to native POST against admin-ajax (returns JSON, no page reload).
-      if (window.console && console.warn) {
-        console.warn('nest-well: subscribe handler missing localize data — form will fall back to native POST');
-      }
-      return;
+    // Config may be absent if wp_localize_script was stripped by a caching
+    // plugin. We still bind the listener so e.preventDefault() fires and the
+    // page never navigates to admin-ajax.php.
+    var config = window.nestWellSubscribe || null;
+    if (!config && window.console && console.warn) {
+      console.warn('nest-well: nestWellSubscribe localize data missing — AJAX subscribe unavailable');
     }
 
     function showSuccess(form, msg) {
@@ -956,6 +955,16 @@
         e.preventDefault();
         if (!input || !input.value || form.dataset.submitting === 'true') return;
 
+        // Guard: config missing at runtime — show error, never navigate away.
+        if (!config) {
+          if (feedback) {
+            feedback.textContent = 'Signup is temporarily unavailable. Please try again later.';
+            feedback.classList.add('is-error');
+            feedback.hidden = false;
+          }
+          return;
+        }
+
         form.dataset.submitting = 'true';
         if (submit) {
           submit.disabled = true;
@@ -968,12 +977,12 @@
         }
 
         var body = new FormData();
-        body.append('action', window.nestWellSubscribe.action);
-        body.append('nonce', window.nestWellSubscribe.nonce);
+        body.append('action', config.action);
+        body.append('nonce', config.nonce);
         body.append('email', input.value);
         body.append('source', form.dataset.source || 'sidebar');
 
-        fetch(window.nestWellSubscribe.ajaxUrl, {
+        fetch(config.ajaxUrl, {
           method: 'POST',
           credentials: 'same-origin',
           body: body
