@@ -28,6 +28,33 @@
   }, true);
 
   // ============================================================
+  // Theme toggle — bound at script-parse time via event delegation
+  // so the toggle works even if a later init function throws or the
+  // button is replaced by client-side rendering. The original
+  // initThemeToggle below still runs to sync aria-pressed/label, but
+  // clicking always toggles even if that init never fires.
+  // ============================================================
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var btn = t.closest('#theme-toggle, .site-header__theme-toggle, .js-theme-toggle');
+    if (!btn) return;
+
+    var html = document.documentElement;
+    var attr = html.getAttribute('data-theme');
+    var current = (attr === 'dark' || attr === 'light')
+      ? attr
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('nest-well-theme', next); } catch (err) {}
+
+    btn.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
+    btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  });
+
+  // ============================================================
   // Utilities
   // ============================================================
 
