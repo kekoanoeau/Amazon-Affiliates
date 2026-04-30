@@ -7,7 +7,10 @@
  * with a clear takeaway + a final affiliate CTA — the conversion-critical
  * close most successful review sites have at the end of the body.
  *
- * Skipped if no verdict was supplied (blank meta).
+ * Renders when the post has any of: verdict text, score, badge, or ASIN.
+ * The verdict-text paragraph is skipped if no `_review_verdict` is set so
+ * the box still acts as a final buy-box for review posts whose authors
+ * haven't filled in a long-form takeaway yet.
  *
  * @package nest-and-well
  * @since 1.0.0
@@ -15,17 +18,18 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$post_id = get_the_ID();
-$verdict = get_post_meta( $post_id, '_review_verdict', true );
-if ( ! $verdict ) {
-    return;
-}
-
+$post_id      = get_the_ID();
+$verdict      = get_post_meta( $post_id, '_review_verdict', true );
 $score        = get_post_meta( $post_id, '_review_score', true );
 $badge        = get_post_meta( $post_id, '_review_badge', true );
 $product_name = get_post_meta( $post_id, '_product_name', true );
 $product_asin = get_post_meta( $post_id, '_product_asin', true );
 $price        = get_post_meta( $post_id, '_product_price', true );
+
+// Skip only when the post has nothing review-related at all.
+if ( ! $verdict && ! $score && ! $badge && ! $product_asin ) {
+    return;
+}
 
 $buy_url = $product_asin ? nest_well_amazon_url( $product_asin ) : '';
 ?>
@@ -74,7 +78,9 @@ $buy_url = $product_asin ? nest_well_amazon_url( $product_asin ) : '';
             <?php endif; ?>
 
             <div class="verdict__copy">
+                <?php if ( $verdict ) : ?>
                 <div class="verdict__text"><?php echo wp_kses_post( wpautop( $verdict ) ); ?></div>
+                <?php endif; ?>
 
                 <?php if ( $buy_url ) : ?>
                 <div class="verdict__cta-row">
