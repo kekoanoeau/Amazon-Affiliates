@@ -2888,10 +2888,14 @@ select:focus-visible {
    ============================================================ */
 .archive-hero {
     background: var(--white);
-    padding: var(--space-xl) 0;
+    padding: var(--space-lg) 0;
     border-bottom: 1px solid var(--lt-stone);
     margin-bottom: var(--space-lg);
 }
+/* Tighten the wrapper padding above the archive hero so posts appear
+   closer to the top on category/tag archive pages (all viewports). */
+body.archive .site-main,
+body.search .site-main { padding-top: var(--space-md); }
 .archive-header__title { margin-bottom: var(--space-sm); }
 .archive-header__category-badge {
     display: inline-block;
@@ -4645,9 +4649,9 @@ select:focus-visible {
 
     .btn { padding: 12px 24px; font-size: 13px; }
 
-    /* Tighten archive (category/tag) page spacing on mobile so posts
-       appear higher up — base is ~160px of stacked padding/margin. */
-    .site-main { padding: var(--space-md) 0; }
+    /* Further compact archive page spacing on small mobile. */
+    body.archive .site-main,
+    body.search .site-main { padding-top: var(--space-sm); }
     .archive-hero {
         padding: var(--space-md) 0;
         margin-bottom: var(--space-md);
