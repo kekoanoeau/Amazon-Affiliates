@@ -5148,19 +5148,15 @@ select:focus-visible {
     .discovery-feed__title { font-size: 22px; }
 
     /* Hide the title text on mobile so the image + price/rating pills
-       carry the card. The <a> stays in the DOM so its ::before tap-overlay
-       still covers the whole card, and the title remains accessible to
-       screen readers. */
+       carry the card. We use font-size:0 instead of the sr-only clip
+       pattern so the child <a> and its ::before full-card tap overlay
+       are not clipped — cards remain tappable. The link text is still
+       in the DOM for screen readers (font-size:0 ≠ display:none). */
     .discovery-card__title {
-        position: absolute;
-        width: 1px;
-        height: 1px;
+        font-size: 0;
+        line-height: 0;
+        margin: 0;
         padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
     }
 
     /* On narrow 2-col mobile, the CTA overlay was overlapping the bottom-corner
