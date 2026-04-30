@@ -1201,18 +1201,16 @@
       btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
     }
 
-    btn.addEventListener('click', function () {
-      var next = currentTheme() === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
-      syncButton();
-    });
+    // Click handling is done at script-parse time via the document-level
+    // delegate near the top of this file. We only sync aria state here.
 
     // Re-sync if the system preference changes and no explicit choice is set.
     if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-        if (!localStorage.getItem(STORAGE_KEY)) syncButton();
-      });
+      try {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+          if (!localStorage.getItem(STORAGE_KEY)) syncButton();
+        });
+      } catch (err) { /* older Safari: addListener fallback not critical */ }
     }
 
     syncButton();
