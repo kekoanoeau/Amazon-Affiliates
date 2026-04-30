@@ -4812,6 +4812,19 @@ select:focus-visible {
 @media (max-width: 479px) {
     .deals-feed__grid { grid-template-columns: repeat(2, 1fr); }
     .deals-feed__title { font-size: 20px; }
+    /* Stack price above the SHOP DEAL CTA so the button isn't clipped in
+       the narrow 2-column layout. */
+    .deal-card__footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-xs);
+    }
+    .deal-card__price { text-align: center; }
+    .deal-card__cta {
+        text-align: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
 }
 
 /* ============================================================
@@ -5121,7 +5134,20 @@ select:focus-visible {
     .discovery-feed { padding: var(--space-2xl) 0; }
     .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 2; column-gap: var(--space-sm); }
     .discovery-feed__title { font-size: 22px; }
-    .discovery-card__title { font-size: 14px; }
+    .discovery-card__title { font-size: 14px; margin: 0; }
+
+    /* On narrow 2-col mobile, the CTA overlay was overlapping the bottom-corner
+       price + rating pills. Hide the CTA — the whole card is already tappable
+       (via .discovery-card__title-link::before) and the pills convey the deal
+       info. The review page itself has prominent buy buttons. */
+    .discovery-card__cta { display: none; }
+
+    /* With CTA gone, tighten the overlay to a title-only bottom strip so it
+       doesn't drown the image. */
+    .discovery-card__overlay {
+        padding: var(--space-sm) var(--space-md);
+        background: linear-gradient(180deg, transparent 45%, rgba(26, 60, 52, 0.92) 100%);
+    }
 }
 
 @media (max-width: 359px) {
