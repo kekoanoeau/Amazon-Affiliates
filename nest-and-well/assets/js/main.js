@@ -12,6 +12,22 @@
   'use strict';
 
   // ============================================================
+  // First-line defense: ensure no .js-subscribe-form ever performs a
+  // native page submit, regardless of DOM-ready timing or whether any
+  // other init function throws before initSubscribeForms binds its
+  // per-form listeners. Capture phase + bound at script-parse time so
+  // it always wins. Without this, forms on pages where an earlier init
+  // errors fall through to a native POST against admin-ajax.php and
+  // the browser navigates to the raw "-1" response page.
+  // ============================================================
+  document.addEventListener('submit', function (e) {
+    var t = e.target;
+    if (t && t.nodeName === 'FORM' && t.classList && t.classList.contains('js-subscribe-form')) {
+      e.preventDefault();
+    }
+  }, true);
+
+  // ============================================================
   // Utilities
   // ============================================================
 
@@ -1191,29 +1207,37 @@
   // ============================================================
   // Init All
   // ============================================================
+  function safeInit(fn, name) {
+    try { fn(); } catch (err) {
+      if (window.console && console.error) {
+        console.error('nest-well: ' + name + ' threw — continuing init', err);
+      }
+    }
+  }
   function init() {
-    initStickyHeader();
-    initMobileMenu();
-    initSearchToggle();
-    initTabFilter();
-    initInfiniteScroll();
-    initLoadMore();
-    initFaqAccordion();
-    initCopyLink();
-    initActiveNav();
-    initTableScroll();
-    initReadingProgress();
-    initBackToTop();
-    initTableOfContents();
-    initStickyBuyBar();
-    initSubscribeForms();
-    initThemeToggle();
-    initPinterestOverlay();
-    initNativeShare();
-    initScrollReveal();
-    initScoreCounters();
-    initStarFillReveal();
-    initComparisonWinners();
+    // Subscribe forms first so any later throw can't prevent submit-listener binding.
+    safeInit(initSubscribeForms, 'initSubscribeForms');
+    safeInit(initStickyHeader, 'initStickyHeader');
+    safeInit(initMobileMenu, 'initMobileMenu');
+    safeInit(initSearchToggle, 'initSearchToggle');
+    safeInit(initTabFilter, 'initTabFilter');
+    safeInit(initInfiniteScroll, 'initInfiniteScroll');
+    safeInit(initLoadMore, 'initLoadMore');
+    safeInit(initFaqAccordion, 'initFaqAccordion');
+    safeInit(initCopyLink, 'initCopyLink');
+    safeInit(initActiveNav, 'initActiveNav');
+    safeInit(initTableScroll, 'initTableScroll');
+    safeInit(initReadingProgress, 'initReadingProgress');
+    safeInit(initBackToTop, 'initBackToTop');
+    safeInit(initTableOfContents, 'initTableOfContents');
+    safeInit(initStickyBuyBar, 'initStickyBuyBar');
+    safeInit(initThemeToggle, 'initThemeToggle');
+    safeInit(initPinterestOverlay, 'initPinterestOverlay');
+    safeInit(initNativeShare, 'initNativeShare');
+    safeInit(initScrollReveal, 'initScrollReveal');
+    safeInit(initScoreCounters, 'initScoreCounters');
+    safeInit(initStarFillReveal, 'initStarFillReveal');
+    safeInit(initComparisonWinners, 'initComparisonWinners');
   }
 
   if (document.readyState === 'loading') {
