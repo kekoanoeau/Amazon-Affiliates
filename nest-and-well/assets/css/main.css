@@ -3492,7 +3492,12 @@ body.search .site-main { padding-top: var(--space-md); }
    26a. CATEGORY FEED PAGE TEMPLATE
    ============================================================ */
 .site-main--category-feed { padding: 0; }
-.site-main--category-feed .hp-feed { padding-top: var(--space-md); }
+/* Eliminate the 48px hp-feed top padding (and any container padding-top)
+   on category feed pages — the category strip nav above already provides
+   visual separation. Posts now sit close to the top. Bottom padding
+   preserved to keep spacing above the footer. */
+.site-main--category-feed .hp-feed,
+.site-main--category-feed .hp-feed.container { padding-top: var(--space-xs); }
 
 .category-feed-hero {
     background: var(--white);
