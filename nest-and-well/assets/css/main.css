@@ -2890,7 +2890,7 @@ select:focus-visible {
     background: var(--white);
     padding: var(--space-xl) 0;
     border-bottom: 1px solid var(--lt-stone);
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-lg);
 }
 .archive-header__title { margin-bottom: var(--space-sm); }
 .archive-header__category-badge {
@@ -4644,6 +4644,14 @@ select:focus-visible {
     .author-bio__avatar-img { width: 60px; height: 60px; }
 
     .btn { padding: 12px 24px; font-size: 13px; }
+
+    /* Tighten archive (category/tag) page spacing on mobile so posts
+       appear higher up — base is ~160px of stacked padding/margin. */
+    .site-main { padding: var(--space-md) 0; }
+    .archive-hero {
+        padding: var(--space-md) 0;
+        margin-bottom: var(--space-md);
+    }
 }
 
 /* — Max 479px — */
