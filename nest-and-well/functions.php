@@ -9,7 +9,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Theme version constant
-define( 'NEST_WELL_VERSION', '1.0.3' );
+define( 'NEST_WELL_VERSION', '1.0.4' );
 define( 'NEST_WELL_DIR', get_template_directory() );
 define( 'NEST_WELL_URI', get_template_directory_uri() );
 
