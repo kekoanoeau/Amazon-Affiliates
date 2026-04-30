@@ -47,16 +47,16 @@ $fetch_code = 'GQP2JW';
 
     <div class="sponsored-ad__body">
         <h4 class="sponsored-ad__headline">
-            <?php esc_html_e( 'Get paid to scan receipts', 'nest-and-well' ); ?>
+            <?php esc_html_e( 'Earn even more on your Amazon orders', 'nest-and-well' ); ?>
         </h4>
         <p class="sponsored-ad__copy">
-            <?php esc_html_e( 'Snap any grocery, takeout, or retail receipt with the Fetch app — earn points and redeem for gift cards.', 'nest-and-well' ); ?>
+            <?php esc_html_e( "Already shopping the picks above? Forward your Amazon order confirmations to Fetch and earn points on top of every purchase — then redeem them for Amazon gift cards.", 'nest-and-well' ); ?>
         </p>
 
         <ul class="sponsored-ad__bullets">
-            <li><?php esc_html_e( 'Free to use, no purchase required', 'nest-and-well' ); ?></li>
-            <li><?php esc_html_e( 'Works with any retailer', 'nest-and-well' ); ?></li>
-            <li><?php esc_html_e( 'Cash out for Amazon, Target, Starbucks &amp; more', 'nest-and-well' ); ?></li>
+            <li><?php esc_html_e( 'Stack rewards on purchases you already make', 'nest-and-well' ); ?></li>
+            <li><?php esc_html_e( 'Works with Amazon, grocery, takeout &amp; more', 'nest-and-well' ); ?></li>
+            <li><?php esc_html_e( 'Cash out for Amazon, Target, Starbucks gift cards', 'nest-and-well' ); ?></li>
         </ul>
 
         <div class="sponsored-ad__bonus">
