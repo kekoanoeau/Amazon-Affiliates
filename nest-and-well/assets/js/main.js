@@ -28,30 +28,54 @@
   }, true);
 
   // ============================================================
-  // Theme toggle — bound at script-parse time via event delegation
-  // so the toggle works even if a later init function throws or the
-  // button is replaced by client-side rendering. The original
-  // initThemeToggle below still runs to sync aria-pressed/label, but
-  // clicking always toggles even if that init never fires.
+  // Theme toggle — shared logic + two independent bindings.
+  //
+  // applyTheme() is the single source of truth.
+  //
+  // Binding 1: document-level delegate (script-parse time, bubble
+  //   phase). Uses a manual parent-walk instead of .closest() so it
+  //   works even when e.target is an SVG <path> or <circle>, where
+  //   some older Safari builds don't support .closest().
+  //
+  // Binding 2: direct btn.addEventListener inside initThemeToggle
+  //   (DOMContentLoaded). Sets e._themeHandled = true so the
+  //   document delegate skips the same click and cannot double-fire.
   // ============================================================
-  document.addEventListener('click', function (e) {
-    var t = e.target;
-    if (!t || !t.closest) return;
-    var btn = t.closest('#theme-toggle, .site-header__theme-toggle, .js-theme-toggle');
-    if (!btn) return;
-
+  function applyTheme(btn) {
     var html = document.documentElement;
     var attr = html.getAttribute('data-theme');
-    var current = (attr === 'dark' || attr === 'light')
-      ? attr
+    var current = attr === 'dark' ? 'dark' : attr === 'light' ? 'light'
       : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     var next = current === 'dark' ? 'light' : 'dark';
 
     html.setAttribute('data-theme', next);
     try { localStorage.setItem('nest-well-theme', next); } catch (err) {}
 
-    btn.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
-    btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    if (btn) {
+      btn.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
+      btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e._themeHandled) return; // direct btn listener already handled this
+    var node = e.target;
+    var btn = null;
+    for (var i = 0; i < 5 && node && node !== document.documentElement; i++) {
+      if (node.nodeType === 1) {
+        var nid = node.id || '';
+        var ncls = (node.getAttribute && node.getAttribute('class')) || '';
+        if (nid === 'theme-toggle' ||
+            ncls.indexOf('site-header__theme-toggle') !== -1 ||
+            ncls.indexOf('js-theme-toggle') !== -1) {
+          btn = node;
+          break;
+        }
+      }
+      node = node.parentNode;
+    }
+    if (!btn) return;
+    applyTheme(btn);
   });
 
   // ============================================================
@@ -1201,8 +1225,12 @@
       btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
     }
 
-    // Click handling is done at script-parse time via the document-level
-    // delegate near the top of this file. We only sync aria state here.
+    // Direct binding — fires before the document delegate (bubble order).
+    // Sets e._themeHandled so the delegate skips the same event.
+    btn.addEventListener('click', function (e) {
+      e._themeHandled = true;
+      applyTheme(btn);
+    });
 
     // Re-sync if the system preference changes and no explicit choice is set.
     if (window.matchMedia) {

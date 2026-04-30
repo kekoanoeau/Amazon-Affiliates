@@ -877,8 +877,10 @@ select:focus-visible {
 .site-header__account-link:hover,
 .site-header__theme-toggle:hover { color: var(--sage); }
 
-/* Theme toggle — show sun in dark mode (means "go light"), moon in light mode. */
-.theme-icon { display: none; }
+/* Theme toggle — show sun in dark mode (means "go light"), moon in light mode.
+   pointer-events:none on the SVGs ensures e.target is always the <button>,
+   eliminating any SVG-child click-handling edge cases. */
+.theme-icon { display: none; pointer-events: none; }
 .theme-icon--moon { display: block; }
 [data-theme="dark"] .theme-icon--moon { display: none; }
 [data-theme="dark"] .theme-icon--sun { display: block; }
