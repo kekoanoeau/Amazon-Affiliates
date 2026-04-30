@@ -5137,7 +5137,22 @@ select:focus-visible {
     .discovery-feed { padding: var(--space-2xl) 0; }
     .discovery-feed[data-density]  .discovery-feed__masonry { column-count: 2; column-gap: var(--space-sm); }
     .discovery-feed__title { font-size: 22px; }
-    .discovery-card__title { font-size: 14px; margin: 0; }
+
+    /* Hide the title text on mobile so the image + price/rating pills
+       carry the card. The <a> stays in the DOM so its ::before tap-overlay
+       still covers the whole card, and the title remains accessible to
+       screen readers. */
+    .discovery-card__title {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
 
     /* On narrow 2-col mobile, the CTA overlay was overlapping the bottom-corner
        price + rating pills. Hide the CTA — the whole card is already tappable
@@ -5145,11 +5160,11 @@ select:focus-visible {
        info. The review page itself has prominent buy buttons. */
     .discovery-card__cta { display: none; }
 
-    /* With CTA gone, tighten the overlay to a title-only bottom strip so it
-       doesn't drown the image. */
+    /* With title + CTA hidden, drop the gradient overlay so the image
+       reads cleanly behind the floating pills. */
     .discovery-card__overlay {
-        padding: var(--space-sm) var(--space-md);
-        background: linear-gradient(180deg, transparent 45%, rgba(26, 60, 52, 0.92) 100%);
+        background: transparent;
+        padding: 0;
     }
 }
 
