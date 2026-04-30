@@ -436,7 +436,7 @@ em, i { font-style: italic; }
 
 .widget-area { width: var(--sidebar-width); flex-shrink: 0; }
 
-.sidebar-sticky { position: sticky; top: 88px; }
+.sidebar-sticky { position: static; }
 
 /* Skip link */
 .skip-link {
