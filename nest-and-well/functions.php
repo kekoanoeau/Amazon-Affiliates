@@ -332,3 +332,12 @@ function nest_well_breadcrumbs() {
     echo implode( ' ' . $separator . ' ', $breadcrumbs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     echo '</nav>';
 }
+
+/**
+ * Remove Jetpack-injected Related Posts from the post content.
+ *
+ * Jetpack appends its Related Posts block via the_content filter.
+ * We have a custom Related Reviews section at the bottom of single.php
+ * so the Jetpack one above the tags is redundant.
+ */
+add_filter( 'jetpack_relatedposts_filter_enabled_for_request', '__return_false' );
