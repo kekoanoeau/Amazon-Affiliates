@@ -1354,6 +1354,7 @@ select:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: var(--space-sm);
 }
 
@@ -4601,6 +4602,8 @@ select:focus-visible {
     .category-strip__list { justify-content: flex-start; gap: var(--space-lg); padding-left: var(--space-md); padding-right: var(--space-md); }
 
     .article-grid--3col { grid-template-columns: 1fr; }
+    /* Override the related-posts 2-col rule (higher specificity) so cards stack on small mobile */
+    .related-posts .article-grid--3col { grid-template-columns: 1fr; }
 
     .byline { flex-direction: column; gap: var(--space-md); }
 
