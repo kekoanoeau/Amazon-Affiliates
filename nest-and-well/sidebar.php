@@ -45,16 +45,9 @@ defined( 'ABSPATH' ) || exit;
     </div>
     <?php endif; ?>
 
-    <!-- Top Picks Widget -->
-    <div class="sidebar__section sidebar__section--top-picks">
-        <?php if ( is_active_sidebar( 'sidebar-top-picks' ) ) : ?>
-            <?php dynamic_sidebar( 'sidebar-top-picks' ); ?>
-        <?php elseif ( is_singular( 'post' ) ) : ?>
-        <div class="widget widget--top-picks">
-            <h4 class="widget-title"><?php esc_html_e( 'Top Picks', 'nest-and-well' ); ?></h4>
-            <?php nest_well_top_picks_default( get_the_ID() ); ?>
-        </div>
-        <?php endif; ?>
+    <!-- Latest Deals Widget -->
+    <div class="sidebar__section sidebar__section--deals">
+        <?php get_template_part( 'template-parts/sidebar-deals' ); ?>
     </div>
 
     <!-- Sponsored Partner — Fetch Referral -->

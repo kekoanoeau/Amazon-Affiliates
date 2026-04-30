@@ -5353,3 +5353,84 @@ select:focus-visible {
     color: var(--forest);
 }
 
+
+/* ============================================================
+   37. SIDEBAR DEALS WIDGET
+   Compact horizontal deal cards for the post-page sidebar.
+   Reuses .deal-card base; .deal-card--sidebar switches to a
+   row layout so image + text sit side by side in the narrow column.
+   ============================================================ */
+
+.widget--deals__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+
+.widget--deals__title {
+    margin: 0;
+}
+
+.widget--deals__view-all {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sage);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.widget--deals__view-all:hover { color: var(--forest); text-decoration: underline; }
+
+.sidebar-deals-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+/* Horizontal card variant for sidebar */
+.deal-card--sidebar {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.deal-card--sidebar .deal-card__image-link {
+    flex-shrink: 0;
+    width: 80px;
+}
+
+.deal-card--sidebar .deal-card__image-wrap {
+    width: 80px;
+    height: 80px;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.deal-card--sidebar .deal-card__body {
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+    gap: 4px;
+}
+
+.deal-card--sidebar .deal-card__title {
+    font-size: 13px;
+    -webkit-line-clamp: 2;
+}
+
+.deal-card--sidebar .deal-card__footer {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding-top: 4px;
+}
+
+.deal-card--sidebar .deal-card__price {
+    font-size: 13px;
+}
+
+.deal-card--sidebar .deal-card__cta {
+    font-size: 10px;
+    padding: 5px 10px;
+}
+
+[data-theme="dark"] .widget--deals__view-all { color: var(--sage); }
