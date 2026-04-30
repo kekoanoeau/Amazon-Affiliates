@@ -1333,6 +1333,8 @@ select:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
     margin-top: auto;
     padding-top: var(--space-md);
     border-top: 1px solid var(--lt-stone);
@@ -1359,6 +1361,7 @@ select:focus-visible {
     padding: 9px 16px;
     letter-spacing: 0.1em;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .article-card__read-link {
