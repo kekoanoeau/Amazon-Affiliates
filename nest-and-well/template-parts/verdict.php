@@ -96,14 +96,7 @@ $buy_url = $product_asin ? nest_well_amazon_url( $product_asin ) : '';
                        rel="nofollow noopener sponsored"
                        data-affiliate="amazon"
                        data-product="<?php echo esc_attr( $product_name ); ?>">
-                        <?php
-                        if ( $product_name ) {
-                            /* translators: %s: product name */
-                            printf( esc_html__( 'Check the %s on Amazon', 'nest-and-well' ), esc_html( $product_name ) );
-                        } else {
-                            esc_html_e( 'Check price on Amazon', 'nest-and-well' );
-                        }
-                        ?>
+                        <?php esc_html_e( 'Check Price on Amazon', 'nest-and-well' ); ?>
                         <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
