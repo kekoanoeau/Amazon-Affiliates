@@ -7,7 +7,9 @@
  *   1. Featured Image (full card width, outside body)
  *   2. Title
  *   3. Excerpt
- *   4. Rating + "CHECK IT OUT" / Save actions
+ *   4. Actions bottom:
+ *      - With badge: row 1 = share; row 2 = rating + SHOP DEAL (amber)
+ *      - Without badge: single row = share + CHECK IT OUT
  *
  * @package nest-and-well
  * @since 1.0.0
@@ -18,6 +20,11 @@ defined( 'ABSPATH' ) || exit;
 $post_id      = get_the_ID();
 $review_score = (float) get_post_meta( $post_id, '_review_score', true );
 $review_badge = get_post_meta( $post_id, '_review_badge', true );
+$asin         = get_post_meta( $post_id, '_product_asin', true );
+
+// Badge → use Amazon URL if ASIN is set, otherwise fall back to permalink.
+$is_amazon  = $review_badge && $asin;
+$deal_url   = $is_amazon ? nest_well_amazon_url( $asin ) : get_permalink();
 
 // Card variant classes
 $card_classes = array( 'article-card' );
@@ -70,10 +77,11 @@ if ( 'editors-choice' === $review_badge ) {
             <?php echo esc_html( wp_trim_words( get_the_excerpt(), 30, '&hellip;' ) ); ?>
         </p>
 
-        <!-- 4. Rating + Actions -->
-        <div class="article-card__bottom">
+        <?php if ( $review_badge ) : ?>
 
-            <!-- Far left: Social share -->
+        <!-- 4a. Badge card: row 1 = share, row 2 = rating + SHOP DEAL -->
+        <div class="article-card__bottom article-card__bottom--badged">
+
             <div class="share-buttons article-card__share" aria-label="<?php esc_attr_e( 'Share this article', 'nest-and-well' ); ?>">
                 <button type="button"
                         class="share-buttons__item share-buttons__item--native js-native-share"
@@ -86,42 +94,84 @@ if ( 'editors-choice' === $review_badge ) {
                         <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                     </svg>
                 </button>
-
                 <a href="https://pinterest.com/pin/create/button/?url=<?php echo rawurlencode( get_permalink() ); ?>&description=<?php echo rawurlencode( get_the_title() ); ?>"
                    class="share-buttons__item share-buttons__item--pinterest"
-                   target="_blank"
-                   rel="noopener noreferrer"
+                   target="_blank" rel="noopener noreferrer"
                    aria-label="<?php esc_attr_e( 'Share on Pinterest', 'nest-and-well' ); ?>">P</a>
-
                 <a href="https://twitter.com/intent/tweet?url=<?php echo rawurlencode( get_permalink() ); ?>&text=<?php echo rawurlencode( get_the_title() ); ?>"
                    class="share-buttons__item share-buttons__item--twitter"
-                   target="_blank"
-                   rel="noopener noreferrer"
+                   target="_blank" rel="noopener noreferrer"
                    aria-label="<?php esc_attr_e( 'Share on X', 'nest-and-well' ); ?>">X</a>
-
                 <button class="share-buttons__item share-buttons__item--copy"
                         data-copy-url="<?php echo esc_attr( get_permalink() ); ?>"
                         aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
                     <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
                 </button>
-
                 <?php nest_well_save_button( $post_id, 'icon' ); ?>
             </div>
 
-            <!-- Middle: Star rating (when present) -->
-            <?php if ( $review_score ) : ?>
-            <div class="article-card__rating">
-                <?php echo wp_kses_post( nest_well_star_rating_html( (float) $review_score ) ); ?>
-                <span class="article-card__score nw-num" data-score-target="<?php echo esc_attr( number_format( (float) $review_score, 1, '.', '' ) ); ?>"><span class="nw-score-num"><?php echo esc_html( number_format( (float) $review_score, 1 ) ); ?></span>/10</span>
-            </div>
-            <?php endif; ?>
+            <div class="article-card__deal-row">
+                <?php if ( $review_score ) : ?>
+                <div class="article-card__rating">
+                    <?php echo wp_kses_post( nest_well_star_rating_html( (float) $review_score ) ); ?>
+                    <span class="article-card__score nw-num" data-score-target="<?php echo esc_attr( number_format( (float) $review_score, 1, '.', '' ) ); ?>"><span class="nw-score-num"><?php echo esc_html( number_format( (float) $review_score, 1 ) ); ?></span>/10</span>
+                </div>
+                <?php endif; ?>
 
-            <!-- Far right: CTA -->
+                <a href="<?php echo esc_url( $deal_url ); ?>"
+                   class="article-card__cta btn btn--deal<?php echo $is_amazon ? ' amazon-affiliate-link' : ''; ?>"
+                   <?php if ( $is_amazon ) : ?>
+                   target="_blank"
+                   rel="nofollow noopener sponsored"
+                   data-affiliate="amazon"
+                   data-product="<?php echo esc_attr( get_the_title() ); ?>"
+                   <?php endif; ?>>
+                    <?php esc_html_e( 'SHOP DEAL', 'nest-and-well' ); ?> &#x2197;
+                </a>
+            </div>
+
+        </div>
+
+        <?php else : ?>
+
+        <!-- 4b. Standard card: single row = share + CHECK IT OUT -->
+        <div class="article-card__bottom">
+
+            <div class="share-buttons article-card__share" aria-label="<?php esc_attr_e( 'Share this article', 'nest-and-well' ); ?>">
+                <button type="button"
+                        class="share-buttons__item share-buttons__item--native js-native-share"
+                        data-share-url="<?php echo esc_attr( get_permalink() ); ?>"
+                        data-share-title="<?php echo esc_attr( get_the_title() ); ?>"
+                        aria-label="<?php esc_attr_e( 'Share', 'nest-and-well' ); ?>"
+                        hidden>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                </button>
+                <a href="https://pinterest.com/pin/create/button/?url=<?php echo rawurlencode( get_permalink() ); ?>&description=<?php echo rawurlencode( get_the_title() ); ?>"
+                   class="share-buttons__item share-buttons__item--pinterest"
+                   target="_blank" rel="noopener noreferrer"
+                   aria-label="<?php esc_attr_e( 'Share on Pinterest', 'nest-and-well' ); ?>">P</a>
+                <a href="https://twitter.com/intent/tweet?url=<?php echo rawurlencode( get_permalink() ); ?>&text=<?php echo rawurlencode( get_the_title() ); ?>"
+                   class="share-buttons__item share-buttons__item--twitter"
+                   target="_blank" rel="noopener noreferrer"
+                   aria-label="<?php esc_attr_e( 'Share on X', 'nest-and-well' ); ?>">X</a>
+                <button class="share-buttons__item share-buttons__item--copy"
+                        data-copy-url="<?php echo esc_attr( get_permalink() ); ?>"
+                        aria-label="<?php esc_attr_e( 'Copy link', 'nest-and-well' ); ?>">
+                    <?php esc_html_e( 'Copy', 'nest-and-well' ); ?>
+                </button>
+                <?php nest_well_save_button( $post_id, 'icon' ); ?>
+            </div>
+
             <a href="<?php the_permalink(); ?>" class="article-card__cta btn btn--primary">
                 <?php esc_html_e( 'CHECK IT OUT', 'nest-and-well' ); ?>
             </a>
 
         </div>
+
+        <?php endif; ?>
 
     </div><!-- .article-card__body -->
 

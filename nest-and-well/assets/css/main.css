@@ -1333,8 +1333,6 @@ select:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    row-gap: var(--space-xs);
     margin-top: auto;
     padding-top: var(--space-md);
     border-top: 1px solid var(--lt-stone);
@@ -1343,6 +1341,21 @@ select:focus-visible {
 
 /* Share group anchors to far left; CTA anchors to far right */
 .article-card__bottom .article-card__cta { margin-left: auto; }
+
+/* Badge card: stacks share row above rating + SHOP DEAL row */
+.article-card__bottom--badged {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+}
+
+/* Second row inside a badged card: rating left, SHOP DEAL right */
+.article-card__deal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
 
 .article-card__rating {
     display: flex;
