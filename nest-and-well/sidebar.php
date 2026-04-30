@@ -57,6 +57,11 @@ defined( 'ABSPATH' ) || exit;
         <?php endif; ?>
     </div>
 
+    <!-- Sponsored Partner — Fetch Referral -->
+    <div class="sidebar__section sidebar__section--sponsored">
+        <?php get_template_part( 'template-parts/sidebar-fetch-ad' ); ?>
+    </div>
+
     <!-- Explore Category -->
     <div class="sidebar__section sidebar__section--explore">
         <?php get_template_part( 'template-parts/explore-category' ); ?>

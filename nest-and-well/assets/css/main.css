@@ -5168,3 +5168,188 @@ select:focus-visible {
     margin: 0 auto;
 }
 
+/* ============================================================
+   36. SPONSORED SIDEBAR AD (Fetch referral)
+   Modest partner card. Uses Fetch yellow as a single accent (CTA
+   pill + corner stripe) so the rest of the card sits comfortably
+   in the sage/forest sidebar without screaming "ad". rel="sponsored"
+   wires it into the existing affiliate.js GA4 click tracking.
+   ============================================================ */
+
+.sponsored-ad {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--lt-stone);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    overflow: hidden;
+    margin-bottom: var(--space-xl);
+}
+.sponsored-ad::before {
+    /* Fetch-yellow accent stripe top */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #FFCD00;
+}
+
+.sponsored-ad__eyebrow {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: var(--space-sm);
+}
+
+.sponsored-ad__media-link {
+    display: block;
+    text-decoration: none;
+}
+.sponsored-ad__media {
+    background: #FFCD00;
+    border-radius: var(--radius-sm);
+    padding: var(--space-md) var(--space-md);
+    margin-bottom: var(--space-md);
+    text-align: center;
+    transition: transform var(--transition-fast);
+}
+.sponsored-ad__media-link:hover .sponsored-ad__media { transform: translateY(-1px); }
+
+.sponsored-ad__wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: #1A1A1A;
+}
+.sponsored-ad__wordmark-text {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+.sponsored-ad__paw {
+    color: #1A1A1A;
+    flex-shrink: 0;
+}
+
+.sponsored-ad__body { font-size: 14px; line-height: 1.5; }
+
+.sponsored-ad__headline {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--forest);
+    line-height: 1.25;
+    margin: 0 0 var(--space-xs);
+}
+
+.sponsored-ad__copy {
+    color: var(--charcoal);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0 0 var(--space-sm);
+}
+
+.sponsored-ad__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-md);
+    font-size: 12.5px;
+    color: var(--charcoal);
+}
+.sponsored-ad__bullets li {
+    position: relative;
+    padding: 4px 0 4px 20px;
+    line-height: 1.4;
+}
+.sponsored-ad__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFCD00;
+}
+
+.sponsored-ad__bonus {
+    background: var(--lt-stone);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-md);
+    font-size: 12px;
+    color: var(--slate);
+    text-align: center;
+    line-height: 1.5;
+}
+.sponsored-ad__bonus-label,
+.sponsored-ad__bonus-note { color: var(--slate); }
+.sponsored-ad__bonus-code {
+    display: inline-block;
+    margin: 0 4px;
+    padding: 2px 8px;
+    background: var(--white);
+    border: 1px dashed var(--mid-stone);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--forest);
+    letter-spacing: 0.04em;
+}
+
+.sponsored-ad__cta {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: #FFCD00;
+    color: #1A1A1A;
+    border: 2px solid #FFCD00;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.sponsored-ad__cta:hover,
+.sponsored-ad__cta:focus-visible {
+    background: #1A1A1A;
+    color: #FFCD00;
+    border-color: #1A1A1A;
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.sponsored-ad__disclaimer {
+    font-size: 11px;
+    color: var(--slate);
+    text-align: center;
+    margin: var(--space-sm) 0 0;
+    line-height: 1.4;
+}
+
+/* Dark mode: keep Fetch yellow (it's the brand cue), darken the
+   surrounding card so the yellow accent reads as intentional. */
+[data-theme="dark"] .sponsored-ad {
+    background: var(--lt-stone);
+    border-color: var(--mid-stone);
+}
+[data-theme="dark"] .sponsored-ad__bonus { background: rgba(0, 0, 0, 0.20); }
+[data-theme="dark"] .sponsored-ad__bonus-code {
+    background: var(--lt-stone);
+    border-color: var(--mid-stone);
+    color: var(--forest);
+}
+
