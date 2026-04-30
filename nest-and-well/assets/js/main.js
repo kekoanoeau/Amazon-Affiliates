@@ -892,23 +892,76 @@
   }
 
   // ============================================================
-  // 12b. Email Subscribe Forms (sidebar / footer)
+  // 12b. Email Subscribe Forms (sidebar / footer / article-end)
   // ============================================================
   function initSubscribeForms() {
     var forms = $$('.js-subscribe-form');
-    if (!forms.length || typeof window.nestWellSubscribe === 'undefined') return;
+    if (!forms.length) return;
+
+    if (typeof window.nestWellSubscribe === 'undefined') {
+      // Without the localized nonce/endpoint we can't bind. Forms will fall
+      // back to native POST against admin-ajax (returns JSON, no page reload).
+      if (window.console && console.warn) {
+        console.warn('nest-well: subscribe handler missing localize data — form will fall back to native POST');
+      }
+      return;
+    }
+
+    function showSuccess(form, msg) {
+      var card = document.createElement('div');
+      card.className = 'subscribe-success';
+      card.setAttribute('role', 'status');
+      card.setAttribute('aria-live', 'polite');
+      card.setAttribute('tabindex', '-1');
+
+      var check = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      check.setAttribute('class', 'subscribe-success__check');
+      check.setAttribute('viewBox', '0 0 24 24');
+      check.setAttribute('fill', 'none');
+      check.setAttribute('stroke', 'currentColor');
+      check.setAttribute('stroke-width', '2.5');
+      check.setAttribute('stroke-linecap', 'round');
+      check.setAttribute('stroke-linejoin', 'round');
+      check.setAttribute('aria-hidden', 'true');
+      check.innerHTML = '<path d="M20 6 9 17l-5-5"/>';
+
+      var title = document.createElement('p');
+      title.className = 'subscribe-success__title';
+      title.textContent = msg || 'Thanks — you\'re on the list.';
+
+      var sub = document.createElement('p');
+      sub.className = 'subscribe-success__sub';
+      sub.textContent = 'Watch your inbox for the confirmation email.';
+
+      card.appendChild(check);
+      card.appendChild(title);
+      card.appendChild(sub);
+
+      form.parentNode.replaceChild(card, form);
+
+      var rect = card.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight) {
+        card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+      try { card.focus({ preventScroll: true }); } catch (e) { card.focus(); }
+    }
 
     forms.forEach(function (form) {
-      var feedback = form.querySelector('.sidebar-email-form__feedback');
-      var submit   = form.querySelector('button[type="submit"]');
-      var input    = form.querySelector('input[type="email"]');
+      var feedback    = form.querySelector('.sidebar-email-form__feedback');
+      var submit      = form.querySelector('button[type="submit"]');
+      var input       = form.querySelector('input[type="email"]');
+      var submitLabel = submit ? submit.textContent : '';
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (!input || !input.value || form.dataset.submitting === 'true') return;
 
         form.dataset.submitting = 'true';
-        if (submit) submit.disabled = true;
+        if (submit) {
+          submit.disabled = true;
+          submit.textContent = 'Subscribing…';
+          submit.classList.add('is-submitting');
+        }
         if (feedback) {
           feedback.hidden = true;
           feedback.classList.remove('is-error', 'is-success');
@@ -929,19 +982,16 @@
           .then(function (res) {
             var msg = (res.json && res.json.data && res.json.data.message) || '';
             if (res.ok && res.json && res.json.success) {
-              if (feedback) {
-                feedback.textContent = msg || 'Thanks!';
-                feedback.classList.add('is-success');
-                feedback.hidden = false;
-              }
-              form.reset();
-            } else {
-              if (feedback) {
-                feedback.textContent = msg || 'Something went wrong. Please try again.';
-                feedback.classList.add('is-error');
-                feedback.hidden = false;
-              }
+              showSuccess(form, msg);
+              return;
             }
+            if (feedback) {
+              feedback.textContent = msg || 'Something went wrong. Please try again.';
+              feedback.classList.add('is-error');
+              feedback.hidden = false;
+            }
+            restoreButton();
+            if (input) input.focus();
           })
           .catch(function () {
             if (feedback) {
@@ -949,11 +999,19 @@
               feedback.classList.add('is-error');
               feedback.hidden = false;
             }
+            restoreButton();
+            if (input) input.focus();
           })
           .finally(function () {
             form.dataset.submitting = 'false';
-            if (submit) submit.disabled = false;
           });
+
+        function restoreButton() {
+          if (!submit) return;
+          submit.disabled = false;
+          submit.textContent = submitLabel;
+          submit.classList.remove('is-submitting');
+        }
       });
     });
   }

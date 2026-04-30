@@ -33,7 +33,12 @@ $primary_name = ( ! empty( $cats ) && isset( $cats[0]->name ) ) ? $cats[0]->name
                 <?php esc_html_e( 'One thoughtful email a week. Real testing, no fluff, easy unsubscribe.', 'nest-and-well' ); ?>
             </p>
         </div>
-        <form class="newsletter-cta__form js-subscribe-form" data-source="article-end" novalidate>
+        <form class="newsletter-cta__form js-subscribe-form"
+              data-source="article-end"
+              method="post"
+              action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+              novalidate>
+            <input type="hidden" name="action" value="nest_well_subscribe">
             <label class="screen-reader-text" for="newsletter-cta-email">
                 <?php esc_html_e( 'Email address', 'nest-and-well' ); ?>
             </label>

@@ -25,7 +25,12 @@ defined( 'ABSPATH' ) || exit;
             <p class="sidebar-email-default__desc">
                 <?php esc_html_e( 'Weekly reviews and deals, no spam.', 'nest-and-well' ); ?>
             </p>
-            <form class="sidebar-email-form js-subscribe-form" data-source="sidebar" novalidate>
+            <form class="sidebar-email-form js-subscribe-form"
+                  data-source="sidebar"
+                  method="post"
+                  action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+                  novalidate>
+                <input type="hidden" name="action" value="nest_well_subscribe">
                 <label for="sidebar-email" class="screen-reader-text">
                     <?php esc_html_e( 'Email address', 'nest-and-well' ); ?>
                 </label>

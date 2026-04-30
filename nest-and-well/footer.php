@@ -30,7 +30,12 @@
                         <?php esc_html_e( 'Join thousands of readers getting our best home, wellness, and gift recommendations every Sunday.', 'nest-and-well' ); ?>
                     </p>
                 </div>
-                <form class="footer-newsletter__form js-subscribe-form" data-source="footer" novalidate>
+                <form class="footer-newsletter__form js-subscribe-form"
+                      data-source="footer"
+                      method="post"
+                      action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+                      novalidate>
+                    <input type="hidden" name="action" value="nest_well_subscribe">
                     <label class="screen-reader-text" for="footer-newsletter-email">
                         <?php esc_html_e( 'Email address', 'nest-and-well' ); ?>
                     </label>
