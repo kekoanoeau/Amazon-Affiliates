@@ -34,12 +34,20 @@ function nest_well_handle_subscribe() {
     $api_key  = get_theme_mod( 'nest_well_mailerlite_api_key', '' );
     $group_id = get_theme_mod( 'nest_well_mailerlite_group_id', '' );
 
+    // Always persist locally first so a failed/slow API call never loses a signup.
+    nest_well_store_subscriber_fallback( $email, $source );
+
     if ( $api_key ) {
         $result = nest_well_mailerlite_subscribe( $email, $api_key, $group_id, $source );
         if ( is_wp_error( $result ) ) {
-            wp_send_json_error(
-                array( 'message' => $result->get_error_message() ),
-                502
+            error_log( sprintf(
+                '[nest-well] MailerLite signup failed for %s: %s',
+                $email,
+                $result->get_error_message()
+            ) );
+            // Don't fail the user-facing request — we already stored locally.
+            wp_send_json_success(
+                array( 'message' => __( 'Thanks — you\'re on the list.', 'nest-and-well' ) )
             );
         }
         wp_send_json_success(
@@ -47,8 +55,6 @@ function nest_well_handle_subscribe() {
         );
     }
 
-    // Fallback: store in options so signups aren't lost before MailerLite is wired.
-    nest_well_store_subscriber_fallback( $email, $source );
     wp_send_json_success(
         array( 'message' => __( 'Thanks — you\'re on the list.', 'nest-and-well' ) )
     );
@@ -57,34 +63,60 @@ add_action( 'wp_ajax_nest_well_subscribe', 'nest_well_handle_subscribe' );
 add_action( 'wp_ajax_nopriv_nest_well_subscribe', 'nest_well_handle_subscribe' );
 
 /**
- * POST a subscriber to MailerLite Classic API.
+ * POST a subscriber to MailerLite.
+ *
+ * Auto-detects which API to call based on token format:
+ *   - New MailerLite (post-2022 accounts) — JWT-style token containing dots →
+ *     POST https://connect.mailerlite.com/api/subscribers with Bearer auth.
+ *   - Classic MailerLite (legacy accounts) — 32-char hex key →
+ *     POST https://api.mailerlite.com/api/v2/subscribers with X-MailerLite-ApiKey.
  *
  * @param string $email    Subscriber email.
- * @param string $api_key  MailerLite API key.
- * @param string $group_id Optional MailerLite group/list ID.
+ * @param string $api_key  MailerLite API token / key.
+ * @param string $group_id Optional MailerLite group / list ID.
  * @param string $source   Source identifier (sidebar / footer / etc).
  * @return true|WP_Error True on success, WP_Error on failure.
  */
 function nest_well_mailerlite_subscribe( $email, $api_key, $group_id = '', $source = '' ) {
-    $endpoint = $group_id
-        ? sprintf( 'https://api.mailerlite.com/api/v2/groups/%s/subscribers', rawurlencode( $group_id ) )
-        : 'https://api.mailerlite.com/api/v2/subscribers';
+    $is_new_api = ( strpos( $api_key, '.' ) !== false );
 
-    $body = array(
-        'email'  => $email,
-        'fields' => array(
-            'signup_source' => $source,
-        ),
-    );
+    if ( $is_new_api ) {
+        $endpoint = 'https://connect.mailerlite.com/api/subscribers';
+        $body     = array(
+            'email'  => $email,
+            'fields' => array(
+                'signup_source' => $source,
+            ),
+        );
+        if ( $group_id ) {
+            $body['groups'] = array( $group_id );
+        }
+        $headers = array(
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+            'Authorization' => 'Bearer ' . $api_key,
+        );
+    } else {
+        $endpoint = $group_id
+            ? sprintf( 'https://api.mailerlite.com/api/v2/groups/%s/subscribers', rawurlencode( $group_id ) )
+            : 'https://api.mailerlite.com/api/v2/subscribers';
+        $body    = array(
+            'email'  => $email,
+            'fields' => array(
+                'signup_source' => $source,
+            ),
+        );
+        $headers = array(
+            'Content-Type'        => 'application/json',
+            'X-MailerLite-ApiKey' => $api_key,
+        );
+    }
 
     $response = wp_remote_post(
         $endpoint,
         array(
             'timeout' => 8,
-            'headers' => array(
-                'Content-Type'      => 'application/json',
-                'X-MailerLite-ApiKey' => $api_key,
-            ),
+            'headers' => $headers,
             'body'    => wp_json_encode( $body ),
         )
     );
@@ -95,9 +127,11 @@ function nest_well_mailerlite_subscribe( $email, $api_key, $group_id = '', $sour
 
     $code = wp_remote_retrieve_response_code( $response );
     if ( $code < 200 || $code >= 300 ) {
+        $api_label = $is_new_api ? 'new' : 'classic';
+        $body_text = wp_remote_retrieve_body( $response );
         return new WP_Error(
             'mailerlite_error',
-            __( 'We couldn\'t reach the mailing list right now. Please try again in a minute.', 'nest-and-well' )
+            sprintf( 'MailerLite %s API returned HTTP %d: %s', $api_label, $code, substr( $body_text, 0, 300 ) )
         );
     }
 

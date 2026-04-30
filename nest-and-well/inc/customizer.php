@@ -540,8 +540,8 @@ function nest_well_customizer_register( $wp_customize ) {
     $wp_customize->add_control(
         'nest_well_mailerlite_api_key',
         array(
-            'label'       => esc_html__( 'MailerLite API Key', 'nest-and-well' ),
-            'description' => esc_html__( 'Found under MailerLite → Integrations → Developer API.', 'nest-and-well' ),
+            'label'       => esc_html__( 'MailerLite API Token', 'nest-and-well' ),
+            'description' => esc_html__( 'New MailerLite: Integrations → MailerLite API → Generate token. Classic MailerLite: Integrations → Developer API. Both formats are auto-detected.', 'nest-and-well' ),
             'section'     => 'nest_well_email',
             'type'        => 'password',
         )
